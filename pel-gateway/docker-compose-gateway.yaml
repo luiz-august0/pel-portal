@@ -1,0 +1,59 @@
+volumes:
+  kong_db_data: {}  # Volume nomeado para persistir dados do Postgres entre reinicializações do container
+
+networks:
+  kong-ee-net:      # Rede bridge personalizada para comunicação isolada entre Kong e Postgres
+    driver: bridge
+
+# Variáveis de ambiente comuns usadas pelos serviços Kong (bootstrap e CP)
+x-kong-config: &kong-env
+  KONG_DATABASE: "off"                # Desabilitar banco de dados para modo DB-less
+
+services:
+  kong-cp:
+    image: 'kong/kong-gateway:3.11.0.3'
+    container_name: kong-cp
+    restart: on-failure:10
+    networks:
+      - kong-ee-net
+    ports:
+      - "8000:8000"  # Proxy HTTP
+      - "8443:8443"  # Proxy HTTPS
+      - "8001:8001"  # API Admin HTTP
+      - "8444:8444"  # API Admin HTTPS
+      - "8002:8002"  # Kong Manager HTTP
+      - "8445:8445"  # Kong Manager HTTPS
+    environment:
+      <<: *kong-env
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yaml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_URL: http://localhost:8002
+      KONG_PASSWORD: handyshake
+      KONG_ADMIN_API_URI: http://localhost:8001
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_PROXY_LISTEN_SSL: 0.0.0.0:8443
+    volumes:
+      # IMPORTANTE: Volume para o arquivo de configuração declarativa
+      - ./kong/declarative:/kong/declarative:ro  # :ro = read-only para segurança
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  # Serviço para validar e aplicar configurações com Deck
+  kong-deck:
+    image: kong/deck
+    container_name: kong-deck
+    networks:
+      - kong-ee-net
+    volumes:
+      - ./kong/declarative:/deck-files:ro
+    profiles: ["deck"]  # Use profile para tornar opcional
+    depends_on:
+      - kong-cp
+    command: >
+      validate 
+      --config /deck-files/kong.yaml
+      --kong-addr http://kong-cp:8001

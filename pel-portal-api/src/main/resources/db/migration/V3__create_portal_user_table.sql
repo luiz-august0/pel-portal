@@ -1,0 +1,22 @@
+create table if not exists portal_user (
+    id uuid not null,
+    user_details_id uuid not null,
+    address_id uuid,
+    name varchar(150) not null,
+    email varchar(255),
+    cpf varchar(11) not null,
+    password varchar(255) not null,
+    active boolean default true,
+    authorized boolean not null default false,
+    reviewed boolean not null default false,
+    responsible_token text,
+    responsible_token_generated_at timestamp,
+    responsible_token_expires_at timestamp,
+    created_at timestamp default current_timestamp,
+    updated_at timestamp,
+    constraint portal_user_pk primary key (id),
+    constraint portal_user_user_details_fk foreign key (user_details_id) references portal_user_details(id) on delete cascade,
+    constraint portal_user_address_fk foreign key (address_id) references portal_address(id) on delete set null,
+    constraint portal_user_un_user_details_id unique (user_details_id),
+    constraint portal_user_un_cpf unique (cpf)
+);

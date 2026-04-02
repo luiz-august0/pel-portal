@@ -1,0 +1,47 @@
+package com.almeja.pel.portal.core.domain.usecase.user;
+
+import com.almeja.pel.portal.core.domain.entity.UserDetailsEntity;
+import com.almeja.pel.portal.core.domain.entity.UserEntity;
+import com.almeja.pel.portal.core.domain.factory.UserFactory;
+import com.almeja.pel.portal.core.domain.service.UserValidatorService;
+import com.almeja.pel.portal.core.dto.UserRegisterDTO;
+import com.almeja.pel.portal.core.dto.record.AuthorizedLinkGeneratedRecord;
+import com.almeja.pel.portal.core.gateway.crypt.UserCryptPasswordGTW;
+import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.gateway.token.AuthorizedLinkGTW;
+import com.almeja.pel.portal.core.mediator.Mediator;
+import com.almeja.pel.portal.core.mediator.command.RegisterUserCommand;
+import com.almeja.pel.portal.core.util.StringUtil;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class RegisterUC {
+
+    private final UserRepositoryGTW userRepositoryGTW;
+    private final UserCryptPasswordGTW userCryptPasswordGTW;
+    private final UserFactory userFactory;
+    private final Mediator mediator;
+
+    @Transactional
+    public void execute(UserRegisterDTO userRegisterDTO) {
+        UserEntity user = userFactory.create(userRegisterDTO.getName(), userRegisterDTO.getEmail(), userRegisterDTO.getCpf(), userRegisterDTO.getPassword(),
+                userRegisterDTO.getBirthDate(), userRegisterDTO.getPhone(), userRegisterDTO.getSpecialNeeds(), userRegisterDTO.getProgramKnowledgeSource(),
+                userRegisterDTO.getProgramKnowledgeSourceOther()
+        );
+        UserDetailsEntity userDetails = user.getUserDetails();
+        user.setPassword(userCryptPasswordGTW.cryptPassword(user.getPassword()));
+        user.setAuthorized(!userDetails.isMinor());
+        // Valida campo de origem de conhecimento do programa
+        if (StringUtil.isNullOrEmpty(userRegisterDTO.getAuthorizedToken())) {
+            UserValidatorService.validateProgramKnowledgeSource(userDetails.getProgramKnowledgeSource(), userDetails.getProgramKnowledgeSourceOther());
+        }
+        boolean generateResponsibleLink = userDetails.isMinor() && StringUtil.isNullOrEmpty(userRegisterDTO.getAuthorizedToken());
+        userRepositoryGTW.save(user);
+        // Dispara o command de criação do usuário para validar o link de autorização, vincular dependentes e gerar link de autorização se necessário
+        mediator.send(new RegisterUserCommand(user, userRegisterDTO.getAuthorizedToken(), generateResponsibleLink));
+    }
+
+}

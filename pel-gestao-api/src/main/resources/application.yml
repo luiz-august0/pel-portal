@@ -1,0 +1,93 @@
+app:
+  version: "1.0.0"
+  name: Gestao PEL API
+  description: "Gestao PEL API"
+  base-path: /api
+  url: ${GESTAO_PEL_API_URL:http://localhost:3000}
+
+api:
+  prefix.v1: ${app.base-path}/v1
+  cors:
+    allowed-origins: ${GESTAO_PEL_API_CORS_ALLOWED_ORIGINS:http://localhost:3000, http://localhost:8000}
+
+spring:
+  application.name: ${app.name}
+  data.rest.base-path: ${app.base-path}
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        enable_lazy_load_no_trans: true
+    open-in-view: false
+
+  datasource:
+    url: ${GESTAO_PEL_API_DB_URL:jdbc:postgresql://localhost:5432/pelgestao}
+    username: ${GESTAO_PEL_API_DB_USERNAME:postgres}
+    password: ${GESTAO_PEL_API_DB_PASSWORD:postgres}
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      group-id: pel-group
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+    consumer:
+      group-id: pel-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: false
+      max-poll-records: 10
+      session-timeout-ms: 30000
+      heartbeat-interval-ms: 10000
+      properties:
+        spring.json.trusted.packages: "*"
+    topics:
+      portal-update-create-user: portal-update-create-user
+      finalize-inscription-register: finalize-inscription-register
+      inscription-contract-pdf-generated: inscription-contract-pdf-generated
+      inscription-certificate-pdf-generated: inscription-certificate-pdf-generated
+      person-declaration-pdf-ask: person-declaration-pdf-ask
+      person-declaration-pdf-generated: person-declaration-pdf-generated
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${GESTAO_PEL_API_AWS_ACCESS_KEY:AWS_ACCESS_KEY}
+      secret-key: ${GESTAO_PEL_API_AWS_SECRET_KEY:AWS_SECRET_KEY}
+    region:
+      static: ${GESTAO_PEL_API_AWS_REGION:AWS_REGION}
+    stack:
+      auto: false
+    s3:
+      bucket-name: ${GESTAO_PEL_API_AWS_S3_BUCKET_NAME:AWS_S3_BUCKET_NAME}
+
+file:
+  upload-dir: ${GESTAO_PEL_API_FILE_INTERNAL_UPLOAD_DIR:./uploads}
+  upload-size: ${GESTAO_PEL_API_FILE_UPLOAD_SIZE:10MB}
+  s3-enabled: ${GESTAO_PEL_API_FILE_S3_ENABLED:false}
+
+server:
+  port: 8082
+  servlet:
+    context-path: /
+  http2:
+    enabled: true
+  compression:
+    enabled: true
+    min-response-size: 1
+    mime-types: text/html,
+      text/xml,
+      text/plain,
+      text/css,
+      text/javascript,
+      application/javascript,
+      application/json,
+      application/xml,
+      application/pdf,
+      image/png,
+      image/jpeg,
+      image/svg+xml
