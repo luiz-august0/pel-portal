@@ -56,7 +56,13 @@ public class AuthInterceptor implements ContainerRequestFilter {
             return;
         }
 
-        String cpf = tokenService.getSubject(token);
+        String cpf;
+        try {
+            cpf = tokenService.getSubject(token);
+        } catch (Exception e) {
+            ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
+        }
         if (StringUtil.isNullOrEmpty(cpf)) {
             ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
