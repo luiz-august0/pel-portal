@@ -5,15 +5,15 @@ import com.almeja.pel.portal.core.domain.enums.EnumTemplateEmail;
 import com.almeja.pel.portal.core.exception.AppException;
 import com.almeja.pel.portal.core.gateway.repository.TemplateEmailRepositoryGTW;
 import com.almeja.pel.portal.core.mail.interfaces.ITemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import jakarta.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Optional;
 
-@Component
+@ApplicationScoped
 public abstract class MailBuilder<Parameter> {
 
-    @Autowired
+    @Inject
     private TemplateEmailRepositoryGTW templateEmailRepositoryGTW;
 
     private final EnumTemplateEmail enumTemplateEmail;

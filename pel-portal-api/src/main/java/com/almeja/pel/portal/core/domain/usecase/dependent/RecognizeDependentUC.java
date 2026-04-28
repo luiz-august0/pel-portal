@@ -1,5 +1,6 @@
 package com.almeja.pel.portal.core.domain.usecase.dependent;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.exception.AppException;
@@ -8,19 +9,20 @@ import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
 import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class RecognizeDependentUC {
 
-    private final UserDependentRepositoryGTW userDependentRepositoryGTW;
-    private final UserRepositoryGTW userRepositoryGTW;
-    private final Mediator mediator;
+    @Inject
+    UserDependentRepositoryGTW userDependentRepositoryGTW;
+    @Inject
+    UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    Mediator mediator;
 
     @Transactional
     public void execute(UUID dependentId, boolean recognize, UserEntity responsible) {

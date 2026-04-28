@@ -9,10 +9,10 @@ import com.almeja.pel.portal.core.dto.CreateUpdateAddressDTO;
 import com.almeja.pel.portal.core.dto.UserRegisterDTO;
 import com.almeja.pel.portal.core.event.NotifyCreateUpdatePortalUserEvent;
 import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import io.quarkus.test.InjectMock;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -27,51 +27,49 @@ import static org.mockito.Mockito.doNothing;
 @DisplayName("Testes de integração de criação e edição de endereço")
 class CreateUpdateAddressIntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private RegisterUC registerUC;
+    @Inject
+    RegisterUC registerUC;
 
-    @Autowired
-    private CreateUpdateAddressUC createUpdateAddressUC;
+    @Inject
+    CreateUpdateAddressUC createUpdateAddressUC;
 
-    @Autowired
-    private UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    UserRepositoryGTW userRepositoryGTW;
 
-    @MockitoBean
-    private NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
+    @InjectMock
+    NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
 
     @Test
     @DisplayName("Deve criar endereço com sucesso para usuário sem endereço")
     void shouldCreateAddressSuccessfullyWhenUserHasNoAddress() {
-        // Given - Registrar usuário adulto sem endereço
+        // Given
         String cpf = "10452376041";
         String email = "usuario.teste@example.com";
 
         UserRegisterDTO userRegisterDTO = createValidUserRegisterDTO(email, cpf);
 
-        // Mock do notifyCreateUpdatePortalUserEvent para não enviar evento
         doNothing().when(notifyCreateUpdatePortalUserEvent).send(any());
 
-        // When - Registrar usuário
+        // When
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
 
-        // Then - Verificar se usuário foi registrado sem endereço
+        // Then
         Optional<UserEntity> registeredUser = userRepositoryGTW.findByCpf(cpf);
         assertThat(registeredUser).isPresent();
         UserEntity user = registeredUser.get();
-        assertThat(user.getAddress()).isNull(); // Usuário não deve ter endereço inicialmente
+        assertThat(user.getAddress()).isNull();
 
-        // Given - Dados do endereço a ser criado
+        // Given
         CreateUpdateAddressDTO addressDTO = createValidCreateUpdateAddressDTO();
 
-        // When - Criar endereço
+        // When
         assertDoesNotThrow(() -> createUpdateAddressUC.execute(user, addressDTO));
 
-        // Then - Verificar se endereço foi criado
+        // Then
         Optional<UserEntity> userWithAddress = userRepositoryGTW.findById(user.getId());
         assertThat(userWithAddress).isPresent();
         UserEntity updatedUser = userWithAddress.get();
 
-        // Verificar dados do endereço criado
         assertThat(updatedUser.getAddress()).isNotNull();
         AddressEntity address = updatedUser.getAddress();
         assertThat(address.getCep()).isEqualTo("12345678");
@@ -88,13 +86,12 @@ class CreateUpdateAddressIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve editar endereço existente com sucesso")
     void shouldUpdateExistingAddressSuccessfully() {
-        // Given - Registrar usuário e criar endereço inicial
+        // Given
         String cpf = "29395428058";
         String email = "usuario.edicao@example.com";
 
         UserRegisterDTO userRegisterDTO = createValidUserRegisterDTO(email, cpf);
-        
-        // Mock do notifyCreateUpdatePortalUserEvent para não enviar evento
+
         doNothing().when(notifyCreateUpdatePortalUserEvent).send(any());
 
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
@@ -103,18 +100,16 @@ class CreateUpdateAddressIntegrationTest extends BaseIntegrationTest {
         assertThat(registeredUser).isPresent();
         UserEntity user = registeredUser.get();
 
-        // Criar endereço inicial
         CreateUpdateAddressDTO initialAddressDTO = createValidCreateUpdateAddressDTO();
         assertDoesNotThrow(() -> createUpdateAddressUC.execute(user, initialAddressDTO));
 
-        // Verificar endereço inicial foi criado
         Optional<UserEntity> userWithInitialAddress = userRepositoryGTW.findById(user.getId());
         assertThat(userWithInitialAddress).isPresent();
         UserEntity userWithAddress = userWithInitialAddress.get();
         assertThat(userWithAddress.getAddress()).isNotNull();
         AddressEntity initialAddress = userWithAddress.getAddress();
 
-        // Given - Dados do endereço editado
+        // Given
         CreateUpdateAddressDTO updatedAddressDTO = new CreateUpdateAddressDTO();
         updatedAddressDTO.setCep("87654321");
         updatedAddressDTO.setStreet("Avenida Paulista");
@@ -124,19 +119,17 @@ class CreateUpdateAddressIntegrationTest extends BaseIntegrationTest {
         updatedAddressDTO.setCity("São Paulo");
         updatedAddressDTO.setState("SP");
 
-        // When - Editar endereço
+        // When
         assertDoesNotThrow(() -> createUpdateAddressUC.execute(userWithAddress, updatedAddressDTO));
 
-        // Then - Verificar se endereço foi editado
+        // Then
         Optional<UserEntity> userWithUpdatedAddress = userRepositoryGTW.findById(user.getId());
         assertThat(userWithUpdatedAddress).isPresent();
         UserEntity finalUser = userWithUpdatedAddress.get();
 
-        // Verificar dados do endereço editado
         assertThat(finalUser.getAddress()).isNotNull();
         AddressEntity updatedAddress = finalUser.getAddress();
 
-        // Verificar que é o mesmo endereço (mesmo ID) mas com dados atualizados
         assertThat(updatedAddress.getId()).isEqualTo(initialAddress.getId());
         assertThat(updatedAddress.getCep()).isEqualTo("87654321");
         assertThat(updatedAddress.getStreet()).isEqualTo("Avenida Paulista");
@@ -146,7 +139,6 @@ class CreateUpdateAddressIntegrationTest extends BaseIntegrationTest {
         assertThat(updatedAddress.getCity()).isEqualTo("São Paulo");
         assertThat(updatedAddress.getState()).isEqualTo("SP");
 
-        // Verificar que timestamps foram atualizados
         assertThat(updatedAddress.getCreatedAt()).isEqualTo(initialAddress.getCreatedAt());
         assertThat(updatedAddress.getUpdatedAt()).isNotNull();
     }
@@ -154,7 +146,7 @@ class CreateUpdateAddressIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve criar e depois editar endereço em sequência")
     void shouldCreateAndThenUpdateAddressInSequence() {
-        // Given - Registrar usuário
+        // Given
         String cpf = "90916419088";
         String email = "usuario.sequencia@example.com";
 
@@ -166,11 +158,11 @@ class CreateUpdateAddressIntegrationTest extends BaseIntegrationTest {
         UserEntity user = registeredUser.get();
         assertThat(user.getAddress()).isNull();
 
-        // When - Criar endereço
+        // When - Create
         CreateUpdateAddressDTO createAddressDTO = createValidCreateUpdateAddressDTO();
         assertDoesNotThrow(() -> createUpdateAddressUC.execute(user, createAddressDTO));
 
-        // Then - Verificar criação
+        // Then
         Optional<UserEntity> userAfterCreation = userRepositoryGTW.findById(user.getId());
         assertThat(userAfterCreation).isPresent();
         UserEntity userWithAddress = userAfterCreation.get();
@@ -180,7 +172,7 @@ class CreateUpdateAddressIntegrationTest extends BaseIntegrationTest {
         assertThat(createdAddress.getCep()).isEqualTo("12345678");
         assertThat(createdAddress.getStreet()).isEqualTo("Rua das Flores");
 
-        // When - Editar o mesmo endereço
+        // When - Update
         CreateUpdateAddressDTO updateAddressDTO = new CreateUpdateAddressDTO();
         updateAddressDTO.setCep("99988877");
         updateAddressDTO.setStreet("Rua das Palmeiras");
@@ -192,14 +184,13 @@ class CreateUpdateAddressIntegrationTest extends BaseIntegrationTest {
 
         assertDoesNotThrow(() -> createUpdateAddressUC.execute(userWithAddress, updateAddressDTO));
 
-        // Then - Verificar edição
+        // Then
         Optional<UserEntity> userAfterUpdate = userRepositoryGTW.findById(user.getId());
         assertThat(userAfterUpdate).isPresent();
         UserEntity finalUser = userAfterUpdate.get();
 
         AddressEntity updatedAddress = finalUser.getAddress();
 
-        // Verificar que é o mesmo endereço editado
         assertThat(updatedAddress.getId()).isEqualTo(createdAddress.getId());
         assertThat(updatedAddress.getCep()).isEqualTo("99988877");
         assertThat(updatedAddress.getStreet()).isEqualTo("Rua das Palmeiras");

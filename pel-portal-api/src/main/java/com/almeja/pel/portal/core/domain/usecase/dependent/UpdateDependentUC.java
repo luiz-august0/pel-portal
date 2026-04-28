@@ -1,5 +1,6 @@
 package com.almeja.pel.portal.core.domain.usecase.dependent;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.service.VerifyDependentService;
 import com.almeja.pel.portal.core.dto.UserUpdateDTO;
@@ -9,18 +10,18 @@ import com.almeja.pel.portal.core.exception.ValidatorException;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateDependentCommand;
 import com.almeja.pel.portal.core.util.DateUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class UpdateDependentUC {
 
-    private final VerifyDependentService verifyDependentService;
-    private final Mediator mediator;
+    @Inject
+    VerifyDependentService verifyDependentService;
+    @Inject
+    Mediator mediator;
 
     @Transactional
     public void execute(UserEntity responsible, UUID userDependentId, UserUpdateDTO userUpdateDTO) {

@@ -3,35 +3,37 @@ package com.almeja.pel.portal.infra.service.aws.s3;
 import com.almeja.pel.portal.core.dto.MultipartDTO;
 import com.almeja.pel.portal.core.exception.AppException;
 import com.almeja.pel.portal.infra.util.FileUtil;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.amazonaws.util.IOUtils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.File;
 import java.io.IOException;
 
-@RequiredArgsConstructor
-@Service
+@ApplicationScoped
 public class S3StorageService {
 
-    @Value("${cloud.aws.s3.bucket-name}")
-    private String bucketName;
+    @ConfigProperty(name = "cloud.aws.s3.bucket-name")
+    String bucketName;
 
-    private final AmazonS3 s3Client;
+    @Inject
+    S3Client s3Client;
 
     public String upload(MultipartDTO multipartDTO, Boolean isPublic) {
         File fileObj = FileUtil.convertMultipartBeanToFile(multipartDTO);
         String filename = FileUtil.generateUniqueFilename(multipartDTO.getFilename());
         try {
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, filename, fileObj);
-            if (isPublic) putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
-            s3Client.putObject(putObjectRequest);
+            PutObjectRequest.Builder builder = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(filename);
+            if (isPublic) {
+                builder.acl(ObjectCannedACL.PUBLIC_READ);
+            }
+            s3Client.putObject(builder.build(), RequestBody.fromFile(fileObj));
             return filename;
         } finally {
             fileObj.delete();
@@ -39,17 +41,23 @@ public class S3StorageService {
     }
 
     public byte[] download(String fileName) {
-        S3Object s3Object = s3Client.getObject(bucketName, fileName);
-        S3ObjectInputStream inputStream = s3Object.getObjectContent();
         try {
-            return IOUtils.toByteArray(inputStream);
-        } catch (IOException e) {
+            ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(
+                    GetObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(fileName)
+                            .build());
+            return objectBytes.asByteArray();
+        } catch (Exception e) {
             throw new AppException(e.getMessage());
         }
     }
 
     public void delete(String fileName) {
-        s3Client.deleteObject(bucketName, fileName);
+        s3Client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build());
     }
 
 }

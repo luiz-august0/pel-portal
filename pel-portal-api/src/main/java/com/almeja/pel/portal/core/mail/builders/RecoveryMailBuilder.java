@@ -4,14 +4,14 @@ import com.almeja.pel.portal.core.domain.entity.TemplateEmailEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumTemplateEmail;
 import com.almeja.pel.portal.core.mail.MailBuilder;
 import com.almeja.pel.portal.core.mail.interfaces.ITemplate;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import jakarta.enterprise.context.ApplicationScoped;
 
-@Component
+@ApplicationScoped
 public class RecoveryMailBuilder extends MailBuilder<String> {
 
-    @Value("${app.url}")
-    private String url;
+    @ConfigProperty(name = "app.url")
+    String url;
 
     public RecoveryMailBuilder() {
         super(EnumTemplateEmail.RECOVERY);

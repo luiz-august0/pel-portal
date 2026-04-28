@@ -5,7 +5,6 @@ import com.almeja.pel.portal.core.domain.enums.EnumProgramKnowledgeSource;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -19,7 +18,6 @@ public class UserRegisterDTO extends BaseDTO {
 
     private String password;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "America/Sao_Paulo")
     private Date birthDate;
 

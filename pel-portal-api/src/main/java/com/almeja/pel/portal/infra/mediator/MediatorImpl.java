@@ -4,27 +4,29 @@ import com.almeja.pel.portal.core.mediator.AsyncCommandHandler;
 import com.almeja.pel.portal.core.mediator.Command;
 import com.almeja.pel.portal.core.mediator.CommandHandler;
 import com.almeja.pel.portal.core.mediator.Mediator;
-import lombok.RequiredArgsConstructor;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.framework.AopProxyUtils;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Implementação do Mediator usando Spring Context para descobrir handlers
- * Roteia commands para seus respectivos handlers automaticamente
- */
-@Component
-@RequiredArgsConstructor
+@ApplicationScoped
 @Slf4j
 public class MediatorImpl implements Mediator {
 
-    private final ApplicationContext applicationContext;
+    @Inject
+    @Any
+    Instance<CommandHandler<?, ?>> handlers;
+
+    @Inject
+    @Any
+    Instance<AsyncCommandHandler<?, ?>> asyncHandlers;
+
     private final Map<Class<?>, CommandHandler<?, ?>> handlerCache = new ConcurrentHashMap<>();
     private final Map<Class<?>, AsyncCommandHandler<?, ?>> asyncHandlerCache = new ConcurrentHashMap<>();
 
@@ -52,38 +54,32 @@ public class MediatorImpl implements Mediator {
         return asyncHandlerCache.computeIfAbsent(commandClass, this::findAsyncHandler);
     }
 
-    @SuppressWarnings("rawtypes")
     private CommandHandler<?, ?> findHandler(Class<?> commandClass) {
-        Map<String, CommandHandler> handlers = applicationContext.getBeansOfType(CommandHandler.class);
-        for (CommandHandler<?, ?> handler : handlers.values()) {
+        for (CommandHandler<?, ?> handler : handlers) {
             Class<?> handlerCommandClass = getCommandClassFromHandler(handler.getClass(), CommandHandler.class);
             if (handlerCommandClass != null && handlerCommandClass.equals(commandClass)) return handler;
         }
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
     private AsyncCommandHandler<?, ?> findAsyncHandler(Class<?> commandClass) {
-        Map<String, AsyncCommandHandler> handlers = applicationContext.getBeansOfType(AsyncCommandHandler.class);
-        for (AsyncCommandHandler<?, ?> handler : handlers.values()) {
-            Class<?> targetClass = AopProxyUtils.ultimateTargetClass(handler);
+        for (AsyncCommandHandler<?, ?> handler : asyncHandlers) {
+            Class<?> targetClass = handler.getClass();
+            // CDI proxies: look at the superclass to get the actual bean class
+            if (targetClass.getName().contains("_Subclass") || targetClass.getName().contains("$$")) {
+                targetClass = targetClass.getSuperclass();
+            }
             Class<?> handlerCommandClass = getCommandClassFromHandler(targetClass, AsyncCommandHandler.class);
             if (handlerCommandClass != null && handlerCommandClass.equals(commandClass)) return handler;
         }
         return null;
     }
 
-    /**
-     * Extrai a classe concreta do command a partir da implementação do handler
-     * Busca nas interfaces implementadas pelo handler para encontrar o tipo parametrizado
-     */
     private Class<?> getCommandClassFromHandler(Class<?> handlerClass, Class<?> targetInterface) {
-        // Busca nas interfaces implementadas
         Type[] genericInterfaces = handlerClass.getGenericInterfaces();
         for (Type genericInterface : genericInterfaces) {
             if (genericInterface instanceof ParameterizedType parameterizedType) {
                 Type rawType = parameterizedType.getRawType();
-                // Verifica se é a interface CommandHandler ou AsyncCommandHandler
                 if (rawType.equals(targetInterface)) {
                     Type[] typeArguments = parameterizedType.getActualTypeArguments();
                     if (typeArguments.length > 0 && typeArguments[0] instanceof Class) {
@@ -92,7 +88,6 @@ public class MediatorImpl implements Mediator {
                 }
             }
         }
-        // Se não encontrou nas interfaces diretas, busca na superclasse
         Class<?> superclass = handlerClass.getSuperclass();
         if (superclass != null && !superclass.equals(Object.class)) {
             return getCommandClassFromHandler(superclass, targetInterface);

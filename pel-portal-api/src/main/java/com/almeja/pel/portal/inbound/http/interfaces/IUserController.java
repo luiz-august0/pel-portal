@@ -7,41 +7,47 @@ import com.almeja.pel.portal.core.dto.UserStatusDTO;
 import com.almeja.pel.portal.core.dto.UserUpdateDTO;
 import com.almeja.pel.portal.core.dto.record.AuthorizedLinkGeneratedRecord;
 import com.almeja.pel.portal.core.dto.record.ChangePasswordRecord;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 import java.util.UUID;
 
 import static com.almeja.pel.portal.infra.constants.PrefixPathConstant.PREFIX_PATH;
 
-@RequestMapping(IUserController.PATH)
+@Path(IUserController.PATH)
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public interface IUserController {
 
     String PATH = PREFIX_PATH + "/user";
 
-    @GetMapping("/current")
+    @GET
+    @Path("/current")
     UserDTO getCurrentUser();
 
-    @PostMapping("/regenerate-responsible-link")
+    @POST
+    @Path("/regenerate-responsible-link")
     AuthorizedLinkGeneratedRecord regenerateResponsibleLink();
 
-    @PutMapping("/update")
-    void updateUser(@RequestBody UserUpdateDTO userUpdateDTO);
+    @PUT
+    @Path("/update")
+    void updateUser(UserUpdateDTO userUpdateDTO);
 
-    @PatchMapping("/update-internal-relationship-type")
-    void updateInternalRelationshipType(@RequestParam(name = "relationshipType", required = false) EnumInternalRelationshipType relationshipType);
+    @PATCH
+    @Path("/update-internal-relationship-type")
+    void updateInternalRelationshipType(@QueryParam("relationshipType") EnumInternalRelationshipType relationshipType);
 
-    @PostMapping("/address")
-    @ResponseStatus(HttpStatus.OK)
-    UUID createUpdateAddress(@RequestBody CreateUpdateAddressDTO createUpdateAddressDTO);
+    @POST
+    @Path("/address")
+    UUID createUpdateAddress(CreateUpdateAddressDTO createUpdateAddressDTO);
 
-    @GetMapping("/status")
-    @ResponseStatus(HttpStatus.OK)
+    @GET
+    @Path("/status")
     List<UserStatusDTO> getUserStatus();
 
-    @PostMapping("/change-password")
-    @ResponseStatus(HttpStatus.OK)
-    void changePassword(@RequestBody ChangePasswordRecord changePasswordRecord);
+    @POST
+    @Path("/change-password")
+    void changePassword(ChangePasswordRecord changePasswordRecord);
 
 }

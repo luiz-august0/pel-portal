@@ -1,21 +1,21 @@
 package com.almeja.pel.portal.core.domain.factory;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDetailsEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumProgramKnowledgeSource;
 import com.almeja.pel.portal.core.domain.service.UserValidatorService;
 import com.almeja.pel.portal.core.util.Util;
 import com.almeja.pel.portal.core.util.enums.EnumDateFormat;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Date;
 
-@Component
-@RequiredArgsConstructor
+@ApplicationScoped
 public class UserFactory {
 
-    private final UserValidatorService userValidatorService;
+    @Inject
+    UserValidatorService userValidatorService;
 
     public UserEntity create(String name, String email, String cpf, String password, Date birthDate,
                              String phone, Boolean specialNeeds, EnumProgramKnowledgeSource programKnowledgeSource,

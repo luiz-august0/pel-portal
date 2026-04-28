@@ -1,18 +1,18 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
 import java.util.Optional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class SubmitUserReviewUC {
 
-    private final UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    UserRepositoryGTW userRepositoryGTW;
 
     @Transactional
     public void execute(String cpf, boolean approved) {

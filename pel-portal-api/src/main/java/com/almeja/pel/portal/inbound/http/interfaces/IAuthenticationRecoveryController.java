@@ -2,19 +2,21 @@ package com.almeja.pel.portal.inbound.http.interfaces;
 
 import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryPasswordRecord;
 import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryRecord;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 
-@RequestMapping(IAuthenticationRecoveryController.PATH)
+@Path(IAuthenticationRecoveryController.PATH)
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public interface IAuthenticationRecoveryController {
 
     String PATH = IAuthenticationController.PATH + "/recovery";
 
-    @PostMapping
-    void generateRecovery(@RequestBody AuthenticationRecoveryRecord authenticationRecoveryRecord);
+    @POST
+    void generateRecovery(AuthenticationRecoveryRecord authenticationRecoveryRecord);
 
-    @PostMapping("/password")
-    void changePassword(@RequestBody AuthenticationRecoveryPasswordRecord authenticationRecoveryPasswordRecord);
+    @POST
+    @Path("/password")
+    void changePassword(AuthenticationRecoveryPasswordRecord authenticationRecoveryPasswordRecord);
 
 }

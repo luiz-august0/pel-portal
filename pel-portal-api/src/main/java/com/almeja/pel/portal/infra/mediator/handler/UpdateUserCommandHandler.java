@@ -3,17 +3,14 @@ package com.almeja.pel.portal.infra.mediator.handler;
 import com.almeja.pel.portal.core.domain.usecase.user.VerifyAndNotifyCreateUpdateUserUC;
 import com.almeja.pel.portal.core.mediator.CommandHandler;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
-/**
- * Handler para UpdateUserCommandHandler
- */
-@Component
-@RequiredArgsConstructor
+@ApplicationScoped
 public class UpdateUserCommandHandler implements CommandHandler<UpdateUserCommand, Void> {
 
-    private final VerifyAndNotifyCreateUpdateUserUC verifyAndNotifyCreateUpdateUserUC;
+    @Inject
+    VerifyAndNotifyCreateUpdateUserUC verifyAndNotifyCreateUpdateUserUC;
 
     @Override
     public Void handle(UpdateUserCommand command) {

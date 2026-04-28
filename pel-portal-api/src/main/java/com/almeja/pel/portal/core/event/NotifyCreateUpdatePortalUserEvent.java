@@ -11,23 +11,27 @@ import com.almeja.pel.portal.core.gateway.event.EventProducerGTW;
 import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
 import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
 import com.almeja.pel.portal.core.util.ConverterEntityToDTOUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class NotifyCreateUpdatePortalUserEvent {
 
-    private final EventProducerGTW eventProducerGTW;
-    private final DocumentRepositoryGTW documentRepositoryGTW;
-    private final UserDependentRepositoryGTW userDependentRepositoryGTW;
+    @Inject
+    EventProducerGTW eventProducerGTW;
 
-    @Value("${spring.kafka.topics.portal-update-create-user}")
-    private String eventName;
+    @Inject
+    DocumentRepositoryGTW documentRepositoryGTW;
+
+    @Inject
+    UserDependentRepositoryGTW userDependentRepositoryGTW;
+
+    @ConfigProperty(name = "spring.kafka.topics.portal-update-create-user")
+    String eventName;
 
     public void send(UserEntity user) {
         EventPortalUserDTO eventPortalUser = createEventPortalUser(user);
