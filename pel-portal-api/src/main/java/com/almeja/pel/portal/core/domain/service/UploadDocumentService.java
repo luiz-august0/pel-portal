@@ -1,5 +1,6 @@
 package com.almeja.pel.portal.core.domain.service;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.DocumentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
@@ -7,17 +8,18 @@ import com.almeja.pel.portal.core.dto.MultipartDTO;
 import com.almeja.pel.portal.core.dto.record.FileUploadedRecord;
 import com.almeja.pel.portal.core.gateway.file.FileHandlerGTW;
 import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class UploadDocumentService {
 
-    private final FileHandlerGTW fileHandlerGTW;
-    private final DocumentRepositoryGTW documentRepositoryGTW;
-    private final DeleteDocumentService deleteDocumentService;
+    @Inject
+    FileHandlerGTW fileHandlerGTW;
+    @Inject
+    DocumentRepositoryGTW documentRepositoryGTW;
+    @Inject
+    DeleteDocumentService deleteDocumentService;
 
     @Transactional
     public void upload(UserEntity user, EnumDocumentType documentType, MultipartDTO multipartDTO) {

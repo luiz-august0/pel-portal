@@ -2,32 +2,33 @@ package com.almeja.pel.portal.infra.service.event;
 
 import com.almeja.pel.portal.core.gateway.event.EventProducerGTW;
 import com.google.gson.Gson;
-import lombok.RequiredArgsConstructor;
+import io.smallrye.reactive.messaging.kafka.api.OutgoingKafkaRecordMetadata;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Service;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.reactive.messaging.Message;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 @Slf4j
 public class KafkaEventProducerService implements EventProducerGTW {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    @Inject
+    @Channel("portal-update-create-user")
+    Emitter<String> emitter;
 
     @Override
     public void send(String eventName, Object object) {
         String jsonObj = new Gson().toJson(object);
         try {
-            kafkaTemplate.send(eventName, jsonObj)
-                    .whenComplete((result, ex) -> {
-                        if (ex == null) {
-                            log.info("Mensagem enviada com sucesso para o tópico {} com objeto: {}", eventName, jsonObj);
-                        } else {
-                            log.error("Erro ao enviar mensagem para o tópico {} com objeto {}", eventName, jsonObj, ex);
-                        }
-                    });
+            emitter.send(Message.of(jsonObj)
+                    .addMetadata(OutgoingKafkaRecordMetadata.<String>builder()
+                            .withTopic(eventName)
+                            .build()));
+            log.info("Mensagem enviada com sucesso para o topico {} com objeto: {}", eventName, jsonObj);
         } catch (Exception e) {
-            log.error("Erro inesperado ao enviar mensagem Kafka para tópico {} com objeto {}", eventName, jsonObj, e);
+            log.error("Erro inesperado ao enviar mensagem Kafka para topico {} com objeto {}", eventName, jsonObj, e);
         }
     }
 

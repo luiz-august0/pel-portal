@@ -2,7 +2,6 @@ package com.almeja.pel.portal.infra.util;
 
 import com.almeja.pel.portal.core.dto.MultipartDTO;
 import com.almeja.pel.portal.core.exception.AppException;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,18 +10,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class FileUtil {
-
-    public static File convertMultipartFileToFile(MultipartFile file) {
-        File convertedFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
-
-        try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
-            fos.write(file.getBytes());
-        } catch (IOException e) {
-            throw new AppException(e.getMessage());
-        }
-
-        return convertedFile;
-    }
 
     public static File convertMultipartBeanToFile(MultipartDTO multipartDTO) {
         File convertedFile = new File(Objects.requireNonNull(multipartDTO.getFilename()));

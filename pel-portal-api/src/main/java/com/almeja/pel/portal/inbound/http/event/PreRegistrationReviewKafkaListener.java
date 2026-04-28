@@ -3,23 +3,22 @@ package com.almeja.pel.portal.inbound.http.event;
 import com.almeja.pel.portal.core.domain.usecase.user.SubmitUserReviewUC;
 import com.almeja.pel.portal.core.event.dto.EventPreRegistrationReviewDTO;
 import com.google.gson.Gson;
-import lombok.RequiredArgsConstructor;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 @Slf4j
-@RequiredArgsConstructor
-@Component
+@ApplicationScoped
 public class PreRegistrationReviewKafkaListener {
 
-    private final SubmitUserReviewUC submitUserReviewUC;
+    @Inject
+    SubmitUserReviewUC submitUserReviewUC;
 
-    @KafkaListener(topics = "${spring.kafka.topics.pre-registration-review}", groupId = "${spring.kafka.consumer.group-id}")
-    public void execute(ConsumerRecord<String, String> record) {
-        EventPreRegistrationReviewDTO eventPreRegistrationReviewDTO = new Gson().fromJson(record.value(), EventPreRegistrationReviewDTO.class);
-        log.info("Pré cadastro com cpf {} aprovado", eventPreRegistrationReviewDTO.getCpf());
+    @Incoming("pre-registration-review")
+    public void execute(String payload) {
+        EventPreRegistrationReviewDTO eventPreRegistrationReviewDTO = new Gson().fromJson(payload, EventPreRegistrationReviewDTO.class);
+        log.info("Pre cadastro com cpf {} aprovado", eventPreRegistrationReviewDTO.getCpf());
         submitUserReviewUC.execute(eventPreRegistrationReviewDTO.getCpf().replaceAll("[^0-9]", ""), eventPreRegistrationReviewDTO.getApproved());
     }
 

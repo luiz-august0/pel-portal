@@ -1,21 +1,21 @@
 package com.almeja.pel.portal.core.domain.service;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.enums.EnumProgramKnowledgeSource;
 import com.almeja.pel.portal.core.exception.ValidatorException;
 import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
 import com.almeja.pel.portal.core.util.CpfUtil;
 import com.almeja.pel.portal.core.util.StringUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Date;
 import java.util.UUID;
 
-@Component
-@RequiredArgsConstructor
+@ApplicationScoped
 public class UserValidatorService {
 
-    private final UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    UserRepositoryGTW userRepositoryGTW;
 
     public void validateName(String name) {
         if (StringUtil.isNullOrEmpty(name)) {

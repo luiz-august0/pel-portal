@@ -5,15 +5,17 @@ import com.almeja.pel.portal.core.domain.usecase.user.GenerateRecoveryUC;
 import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryPasswordRecord;
 import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryRecord;
 import com.almeja.pel.portal.inbound.http.interfaces.IAuthenticationRecoveryController;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
-@RequiredArgsConstructor
-@RestController
+@ApplicationScoped
 public class AuthenticationRecoveryController implements IAuthenticationRecoveryController {
 
-    private final GenerateRecoveryUC generateRecoveryUC;
-    private final ChangePasswordByRecoveryUC changePasswordByRecoveryUC;
+    @Inject
+    GenerateRecoveryUC generateRecoveryUC;
+
+    @Inject
+    ChangePasswordByRecoveryUC changePasswordByRecoveryUC;
 
     @Override
     public void generateRecovery(AuthenticationRecoveryRecord authenticationRecoveryRecord) {

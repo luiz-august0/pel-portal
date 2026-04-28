@@ -4,72 +4,76 @@ import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.dto.*;
 import com.almeja.pel.portal.infra.dto.DependentDTO;
 import com.almeja.pel.portal.infra.dto.DependentsLinkedListDTO;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.UUID;
 
 import static com.almeja.pel.portal.infra.constants.PrefixPathConstant.PREFIX_PATH;
 
-@RequestMapping(IDependentController.PATH)
+@Path(IDependentController.PATH)
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public interface IDependentController {
 
     String PATH = PREFIX_PATH + "/dependent";
 
-    @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
-    UUID create(@RequestBody DependentCreateDTO dependentCreateDTO);
+    @POST
+    @Path("/create")
+    Response create(DependentCreateDTO dependentCreateDTO);
 
-    @GetMapping("/list")
-    @ResponseStatus(HttpStatus.OK)
+    @GET
+    @Path("/list")
     DependentsLinkedListDTO getList();
 
-    @GetMapping("/{id}/info")
-    @ResponseStatus(HttpStatus.OK)
-    DependentDTO getInfo(@PathVariable("id") UUID id);
+    @GET
+    @Path("/{id}/info")
+    DependentDTO getInfo(@PathParam("id") UUID id);
 
-    @PostMapping("/{id}/recognize")
-    @ResponseStatus(HttpStatus.OK)
-    void recognize(@PathVariable("id") UUID id,
-                   @RequestParam(name = "recognize", defaultValue = "false") boolean recognize);
+    @POST
+    @Path("/{id}/recognize")
+    void recognize(@PathParam("id") UUID id,
+                   @QueryParam("recognize") @DefaultValue("false") boolean recognize);
 
-    @PutMapping("/{id}/update")
-    @ResponseStatus(HttpStatus.OK)
-    void updateDependent(@PathVariable("id") UUID id,
-                         @RequestBody UserUpdateDTO userUpdateDTO);
+    @PUT
+    @Path("/{id}/update")
+    void updateDependent(@PathParam("id") UUID id,
+                         UserUpdateDTO userUpdateDTO);
 
-    @PutMapping("/{id}/update-relationship-special-needs")
-    @ResponseStatus(HttpStatus.OK)
-    void addRelationshipAndUpdateSpecialNeeds(@PathVariable("id") UUID id,
-                                              @RequestBody DependentRelationshipAndSpecialNeedsDTO dto);
+    @PUT
+    @Path("/{id}/update-relationship-special-needs")
+    void addRelationshipAndUpdateSpecialNeeds(@PathParam("id") UUID id,
+                                              DependentRelationshipAndSpecialNeedsDTO dto);
 
-    @PostMapping("/{id}/address")
-    @ResponseStatus(HttpStatus.OK)
-    void createUpdateAddress(@PathVariable("id") UUID id,
-                             @RequestBody CreateUpdateDependentAddressDTO dto);
+    @POST
+    @Path("/{id}/address")
+    void createUpdateAddress(@PathParam("id") UUID id,
+                             CreateUpdateDependentAddressDTO dto);
 
-    @PostMapping("/{id}/document/upload")
-    @ResponseStatus(HttpStatus.CREATED)
-    void uploadDocument(@PathVariable("id") UUID id,
-                        @RequestParam(name = "documentType") EnumDocumentType documentType,
-                        @RequestBody MultipartDTO multipartDTO);
+    @POST
+    @Path("/{id}/document/upload")
+    Response uploadDocument(@PathParam("id") UUID id,
+                            @QueryParam("documentType") EnumDocumentType documentType,
+                            MultipartDTO multipartDTO);
 
-    @GetMapping("/{id}/document")
-    @ResponseStatus(HttpStatus.OK)
-    DocumentDTO getDocument(@PathVariable("id") UUID id,
-                            @RequestParam(name = "documentType") EnumDocumentType documentType);
+    @GET
+    @Path("/{id}/document")
+    DocumentDTO getDocument(@PathParam("id") UUID id,
+                            @QueryParam("documentType") EnumDocumentType documentType);
 
-    @GetMapping("/{id}/document/download")
-    @ResponseStatus(HttpStatus.OK)
-    byte[] downloadDocument(@PathVariable("id") UUID id,
-                            @RequestParam(name = "documentType") EnumDocumentType documentType);
+    @GET
+    @Path("/{id}/document/download")
+    byte[] downloadDocument(@PathParam("id") UUID id,
+                            @QueryParam("documentType") EnumDocumentType documentType);
 
-    @DeleteMapping("/{id}/document/delete")
-    @ResponseStatus(HttpStatus.OK)
-    void deleteDocument(@PathVariable("id") UUID id,
-                        @RequestParam(name = "documentType") EnumDocumentType documentType);
+    @DELETE
+    @Path("/{id}/document/delete")
+    void deleteDocument(@PathParam("id") UUID id,
+                        @QueryParam("documentType") EnumDocumentType documentType);
 
-    @GetMapping("/responsible")
+    @GET
+    @Path("/responsible")
     DependentDTO getResponsible();
 
 }

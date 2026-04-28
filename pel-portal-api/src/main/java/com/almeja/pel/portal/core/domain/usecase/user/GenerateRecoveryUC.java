@@ -1,5 +1,6 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryRecord;
 import com.almeja.pel.portal.core.exception.AppException;
@@ -10,19 +11,21 @@ import com.almeja.pel.portal.core.mail.builders.RecoveryMailBuilder;
 import com.almeja.pel.portal.core.mail.interfaces.ITemplate;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.SendMailCommand;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Optional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class GenerateRecoveryUC {
 
-    private final UserRepositoryGTW userRepositoryGTW;
-    private final RecoveryMailBuilder recoveryMailBuilder;
-    private final RecoveryTokenGTW recoveryTokenGTW;
-    private final Mediator mediator;
+    @Inject
+    UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    RecoveryMailBuilder recoveryMailBuilder;
+    @Inject
+    RecoveryTokenGTW recoveryTokenGTW;
+    @Inject
+    Mediator mediator;
 
     public void execute(AuthenticationRecoveryRecord authenticationRecoveryRecord) {
         Optional<UserEntity> optionalUser = userRepositoryGTW.findByCpf(authenticationRecoveryRecord.cpf());

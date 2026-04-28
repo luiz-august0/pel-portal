@@ -1,5 +1,6 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDetailsEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.factory.UserFactory;
@@ -13,17 +14,19 @@ import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.RegisterUserCommand;
 import com.almeja.pel.portal.core.util.StringUtil;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class RegisterUC {
 
-    private final UserRepositoryGTW userRepositoryGTW;
-    private final UserCryptPasswordGTW userCryptPasswordGTW;
-    private final UserFactory userFactory;
-    private final Mediator mediator;
+    @Inject
+    UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    UserCryptPasswordGTW userCryptPasswordGTW;
+    @Inject
+    UserFactory userFactory;
+    @Inject
+    Mediator mediator;
 
     @Transactional
     public void execute(UserRegisterDTO userRegisterDTO) {

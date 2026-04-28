@@ -8,10 +8,10 @@ import com.almeja.pel.portal.core.dto.UserRegisterDTO;
 import com.almeja.pel.portal.core.dto.UserUpdateDTO;
 import com.almeja.pel.portal.core.event.NotifyCreateUpdatePortalUserEvent;
 import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import io.quarkus.test.InjectMock;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -25,22 +25,22 @@ import static org.mockito.Mockito.doNothing;
 @DisplayName("Testes de integração de edição de usuário")
 class UpdateUserIntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private RegisterUC registerUC;
+    @Inject
+    RegisterUC registerUC;
 
-    @Autowired
-    private UpdateUserUC updateUserUC;
+    @Inject
+    UpdateUserUC updateUserUC;
 
-    @Autowired
-    private UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    UserRepositoryGTW userRepositoryGTW;
 
-    @MockitoBean
-    private NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
+    @InjectMock
+    NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
 
     @Test
     @DisplayName("Deve editar usuário adulto com sucesso após registro")
     void shouldEditAdultUserSuccessfullyAfterRegistration() {
-        // Given - Registrar usuário adulto
+        // Given
         String originalCpf = "11144477735";
         String originalEmail = "usuario.original@example.com";
         String originalName = "Usuario Original";
@@ -51,23 +51,22 @@ class UpdateUserIntegrationTest extends BaseIntegrationTest {
         userRegisterDTO.setPhone(originalPhone);
         userRegisterDTO.setBirthDate(Date.from(LocalDate.now().minusYears(25).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-        // Mock do notifyCreateUpdatePortalUserEvent para não enviar evento
         doNothing().when(notifyCreateUpdatePortalUserEvent).send(any());
 
-        // When - Registrar usuário
+        // When
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
 
-        // Then - Verificar se usuário foi registrado
+        // Then
         Optional<UserEntity> registeredUser = userRepositoryGTW.findByCpf(originalCpf);
         assertTrue(registeredUser.isPresent());
         UserEntity user = registeredUser.get();
         assertTrue(user.getActive());
-        assertTrue(user.getAuthorized()); // Adulto deve estar autorizado
+        assertTrue(user.getAuthorized());
         assertEquals(originalName, user.getName());
         assertEquals(originalEmail, user.getEmail());
         assertEquals(originalPhone, user.getUserDetails().getPhone());
 
-        // Given - Dados para edição
+        // Given
         String newName = "Usuario Editado";
         String newEmail = "usuario.editado@example.com";
         String newPhone = "11999888777";
@@ -78,23 +77,21 @@ class UpdateUserIntegrationTest extends BaseIntegrationTest {
         userUpdateDTO.setEmail(newEmail);
         userUpdateDTO.setPhone(newPhone);
         userUpdateDTO.setBirthDate(newBirthDate);
-        userUpdateDTO.setCpf(originalCpf); // CPF não deve mudar
+        userUpdateDTO.setCpf(originalCpf);
 
-        // When - Editar usuário
+        // When
         assertDoesNotThrow(() -> updateUserUC.execute(user, userUpdateDTO));
 
-        // Then - Verificar se dados foram atualizados
+        // Then
         Optional<UserEntity> editedUser = userRepositoryGTW.findByCpf(originalCpf);
         assertTrue(editedUser.isPresent());
         UserEntity updatedUser = editedUser.get();
 
-        // Verificar dados atualizados
         assertEquals(newName, updatedUser.getName());
         assertEquals(newEmail, updatedUser.getEmail());
         assertEquals(newPhone, updatedUser.getUserDetails().getPhone());
-        assertEquals(originalCpf, updatedUser.getCpf()); // CPF deve permanecer o mesmo
+        assertEquals(originalCpf, updatedUser.getCpf());
 
-        // Verificar que dados de controle não mudaram
         assertTrue(updatedUser.getActive());
         assertTrue(updatedUser.getAuthorized());
         assertEquals(user.getId(), updatedUser.getId());

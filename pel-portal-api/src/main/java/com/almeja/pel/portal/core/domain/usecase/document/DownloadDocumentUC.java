@@ -1,22 +1,23 @@
 package com.almeja.pel.portal.core.domain.usecase.document;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.DocumentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.exception.ValidatorException;
 import com.almeja.pel.portal.core.gateway.file.FileHandlerGTW;
 import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Optional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class DownloadDocumentUC {
 
-    private final DocumentRepositoryGTW documentRepositoryGTW;
-    private final FileHandlerGTW fileHandlerGTW;
+    @Inject
+    DocumentRepositoryGTW documentRepositoryGTW;
+    @Inject
+    FileHandlerGTW fileHandlerGTW;
 
     public byte[] execute(UserEntity user, EnumDocumentType documentType, boolean validateMinor) {
         if (user.getUserDetails().isMinor() && validateMinor)

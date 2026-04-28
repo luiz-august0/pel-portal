@@ -1,22 +1,24 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.factory.UserFactory;
 import com.almeja.pel.portal.core.dto.UserUpdateDTO;
 import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class UpdateUserUC {
 
-    private final UserRepositoryGTW userRepositoryGTW;
-    private final UserFactory userFactory;
-    private final Mediator mediator;
+    @Inject
+    UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    UserFactory userFactory;
+    @Inject
+    Mediator mediator;
 
     @Transactional
     public void execute(UserEntity user, UserUpdateDTO userUpdateDTO) {

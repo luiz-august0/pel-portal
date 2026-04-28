@@ -1,5 +1,6 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.AddressEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.dto.CreateUpdateAddressDTO;
@@ -7,19 +8,20 @@ import com.almeja.pel.portal.core.gateway.repository.AddressRepositoryGTW;
 import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class CreateUpdateAddressUC {
 
-    private final AddressRepositoryGTW addressRepositoryGTW;
-    private final UserRepositoryGTW userRepositoryGTW;
-    private final Mediator mediator;
+    @Inject
+    AddressRepositoryGTW addressRepositoryGTW;
+    @Inject
+    UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    Mediator mediator;
 
     @Transactional
     public UUID execute(UserEntity user, CreateUpdateAddressDTO createUpdateAddressDTO) {

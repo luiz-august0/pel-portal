@@ -1,5 +1,6 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.DocumentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
@@ -7,20 +8,21 @@ import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.event.NotifyCreateUpdatePortalUserEvent;
 import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
 import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class VerifyAndNotifyCreateUpdateUserUC {
 
-    private final NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
-    private final DocumentRepositoryGTW documentRepositoryGTW;
-    private final UserDependentRepositoryGTW userDependentRepositoryGTW;
+    @Inject
+    NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
+    @Inject
+    DocumentRepositoryGTW documentRepositoryGTW;
+    @Inject
+    UserDependentRepositoryGTW userDependentRepositoryGTW;
 
     @Transactional
     public void execute(UserEntity user) {

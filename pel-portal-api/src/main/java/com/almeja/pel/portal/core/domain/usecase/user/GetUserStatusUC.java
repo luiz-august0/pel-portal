@@ -1,21 +1,21 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.DocumentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.dto.UserStatusDTO;
 import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class GetUserStatusUC {
 
-    private final DocumentRepositoryGTW documentRepositoryGTW;
+    @Inject
+    DocumentRepositoryGTW documentRepositoryGTW;
 
     public List<UserStatusDTO> execute(UserEntity user) {
         List<UserStatusDTO> status = new ArrayList<>();

@@ -8,21 +8,21 @@ import com.almeja.pel.portal.core.gateway.token.AuthorizedLinkGTW;
 import com.almeja.pel.portal.core.util.DateUtil;
 import com.almeja.pel.portal.infra.service.token.TokenService;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.time.Instant;
 import java.util.Date;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class AuthorizedLinkService implements AuthorizedLinkGTW {
 
-    private final TokenService tokenService;
+    @Inject
+    TokenService tokenService;
 
-    @Value("${app.url}")
-    private String url;
+    @ConfigProperty(name = "app.url")
+    String url;
 
     @Override
     public AuthorizedLinkGeneratedRecord generateResponsibleLink(String cpf) {

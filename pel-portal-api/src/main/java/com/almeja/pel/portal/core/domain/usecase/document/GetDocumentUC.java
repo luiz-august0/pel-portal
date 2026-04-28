@@ -1,18 +1,18 @@
 package com.almeja.pel.portal.core.domain.usecase.document;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.DocumentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.exception.ValidatorException;
 import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class GetDocumentUC {
 
-    private final DocumentRepositoryGTW documentRepositoryGTW;
+    @Inject
+    DocumentRepositoryGTW documentRepositoryGTW;
 
     public DocumentEntity execute(UserEntity user, EnumDocumentType documentType, boolean validateMinor) {
         if (user.getUserDetails().isMinor() && validateMinor)

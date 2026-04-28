@@ -1,20 +1,20 @@
 package com.almeja.pel.portal.core.domain.usecase.dependent;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.dto.DependentsLinkedListDTO;
 import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class ListDependentsLinkedUC {
 
-    private final UserDependentRepositoryGTW userDependentRepositoryGTW;
+    @Inject
+    UserDependentRepositoryGTW userDependentRepositoryGTW;
 
     public DependentsLinkedListDTO execute(UserEntity user) {
         List<UserDependentEntity> dependents = userDependentRepositoryGTW.findAllByUser(user);

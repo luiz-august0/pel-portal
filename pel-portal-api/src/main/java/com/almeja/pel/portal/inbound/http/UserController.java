@@ -11,23 +11,38 @@ import com.almeja.pel.portal.core.dto.record.ChangePasswordRecord;
 import com.almeja.pel.portal.core.util.ConverterEntityToDTOUtil;
 import com.almeja.pel.portal.inbound.http.interfaces.IUserController;
 import com.almeja.pel.portal.infra.context.AuthContext;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
-@RestController
+@ApplicationScoped
 public class UserController implements IUserController {
 
-    private final GenerateResponsibleLinkUC generateResponsibleLinkUC;
-    private final UpdateUserUC updateUserUC;
-    private final CreateUpdateAddressUC createUpdateAddressUC;
-    private final UpdateInternalRelationshipTypeUC updateInternalRelationshipTypeUC;
-    private final GetUserStatusUC getUserStatusUC;
-    private final ChangePasswordUC changePasswordUC;
-    private final GetCurrentUserUC getCurrentUserUC;
+    @Inject
+    GenerateResponsibleLinkUC generateResponsibleLinkUC;
+
+    @Inject
+    UpdateUserUC updateUserUC;
+
+    @Inject
+    CreateUpdateAddressUC createUpdateAddressUC;
+
+    @Inject
+    UpdateInternalRelationshipTypeUC updateInternalRelationshipTypeUC;
+
+    @Inject
+    GetUserStatusUC getUserStatusUC;
+
+    @Inject
+    ChangePasswordUC changePasswordUC;
+
+    @Inject
+    GetCurrentUserUC getCurrentUserUC;
+
+    @Inject
+    AuthContext authContext;
 
     @Override
     public UserDTO getCurrentUser() {
@@ -36,32 +51,32 @@ public class UserController implements IUserController {
 
     @Override
     public AuthorizedLinkGeneratedRecord regenerateResponsibleLink() {
-        return generateResponsibleLinkUC.execute(AuthContext.getUser());
+        return generateResponsibleLinkUC.execute(authContext.getUser());
     }
 
     @Override
     public void updateUser(UserUpdateDTO userUpdateDTO) {
-        updateUserUC.execute(AuthContext.getUser(), userUpdateDTO);
+        updateUserUC.execute(authContext.getUser(), userUpdateDTO);
     }
 
     @Override
     public void updateInternalRelationshipType(EnumInternalRelationshipType relationshipType) {
-        updateInternalRelationshipTypeUC.execute(AuthContext.getUser(), relationshipType);
+        updateInternalRelationshipTypeUC.execute(authContext.getUser(), relationshipType);
     }
 
     @Override
     public UUID createUpdateAddress(CreateUpdateAddressDTO createUpdateAddressDTO) {
-        return createUpdateAddressUC.execute(AuthContext.getUser(), createUpdateAddressDTO);
+        return createUpdateAddressUC.execute(authContext.getUser(), createUpdateAddressDTO);
     }
 
     @Override
     public List<UserStatusDTO> getUserStatus() {
-        return getUserStatusUC.execute(AuthContext.getUser());
+        return getUserStatusUC.execute(authContext.getUser());
     }
 
     @Override
     public void changePassword(ChangePasswordRecord changePasswordRecord) {
-        changePasswordUC.execute(AuthContext.getUser(), changePasswordRecord);
+        changePasswordUC.execute(authContext.getUser(), changePasswordRecord);
     }
 
 }
