@@ -8,13 +8,19 @@ import com.almeja.pel.portal.core.domain.usecase.document.UploadDocumentUC;
 import com.almeja.pel.portal.core.dto.DocumentDTO;
 import com.almeja.pel.portal.core.dto.MultipartDTO;
 import com.almeja.pel.portal.core.util.ConverterEntityToDTOUtil;
-import com.almeja.pel.portal.inbound.http.interfaces.IDocumentController;
 import com.almeja.pel.portal.infra.context.AuthContext;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+
+import static com.almeja.pel.portal.infra.constants.PrefixPathConstant.PREFIX_PATH;
 
 @ApplicationScoped
-public class DocumentController implements IDocumentController {
+@Path(PREFIX_PATH + "/document")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class DocumentController {
 
     @Inject
     UploadDocumentUC uploadDocumentUC;
@@ -31,23 +37,26 @@ public class DocumentController implements IDocumentController {
     @Inject
     AuthContext authContext;
 
-    @Override
-    public void upload(EnumDocumentType documentType, MultipartDTO multipartDTO) {
+    @POST
+    @Path("/upload")
+    public void upload(@QueryParam("documentType") EnumDocumentType documentType, MultipartDTO multipartDTO) {
         uploadDocumentUC.execute(authContext.getUser(), documentType, multipartDTO, true);
     }
 
-    @Override
-    public void delete(EnumDocumentType documentType) {
+    @DELETE
+    @Path("/delete")
+    public void delete(@QueryParam("documentType") EnumDocumentType documentType) {
         deleteDocumentUC.execute(authContext.getUser(), documentType, true);
     }
 
-    @Override
-    public DocumentDTO getDocument(EnumDocumentType documentType) {
+    @GET
+    public DocumentDTO getDocument(@QueryParam("documentType") EnumDocumentType documentType) {
         return ConverterEntityToDTOUtil.convert(getDocumentUC.execute(authContext.getUser(), documentType, true), DocumentDTO.class);
     }
 
-    @Override
-    public byte[] downloadDocument(EnumDocumentType documentType) {
+    @GET
+    @Path("/download")
+    public byte[] downloadDocument(@QueryParam("documentType") EnumDocumentType documentType) {
         return downloadDocumentUC.execute(authContext.getUser(), documentType, true);
     }
 
