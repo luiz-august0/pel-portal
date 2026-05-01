@@ -6,7 +6,7 @@ import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.domain.service.UploadDocumentService;
 import com.almeja.pel.portal.core.dto.MultipartDTO;
 import com.almeja.pel.portal.core.exception.ValidatorException;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,7 +19,7 @@ public class UploadDocumentUC {
     @Inject
     UploadDocumentService uploadDocumentService;
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
     @Inject
     Mediator mediator;
 
@@ -30,7 +30,7 @@ public class UploadDocumentUC {
         user.validateReviewed();
         uploadDocumentService.upload(user, documentType, multipartDTO);
         user.setReviewed(false);
-        userRepositoryGTW.save(user);
+        userRepository.save(user);
         mediator.send(new UpdateUserCommand(user));
     }
 

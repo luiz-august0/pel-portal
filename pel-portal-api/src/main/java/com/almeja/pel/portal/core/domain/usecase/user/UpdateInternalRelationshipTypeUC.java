@@ -4,7 +4,7 @@ import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumInternalRelationshipType;
 import com.almeja.pel.portal.core.exception.ValidatorException;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,7 +14,7 @@ import jakarta.transaction.Transactional;
 public class UpdateInternalRelationshipTypeUC {
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
     @Inject
     Mediator mediator;
 
@@ -25,7 +25,7 @@ public class UpdateInternalRelationshipTypeUC {
         user.validateReviewed();
         user.getUserDetails().updateInternalRelationshipType(internalRelationshipType);
         user.setReviewed(false);
-        userRepositoryGTW.save(user);
+        userRepository.save(user);
         mediator.send(new UpdateUserCommand(user));
     }
 

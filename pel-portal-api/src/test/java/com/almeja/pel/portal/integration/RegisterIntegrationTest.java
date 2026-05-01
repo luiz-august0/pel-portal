@@ -8,9 +8,10 @@ import com.almeja.pel.portal.core.domain.usecase.user.RegisterUC;
 import com.almeja.pel.portal.core.dto.DependentsLinkedListDTO;
 import com.almeja.pel.portal.core.dto.UserRegisterDTO;
 import com.almeja.pel.portal.core.event.NotifyCreateUpdatePortalUserEvent;
-import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserDependentRepository;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import io.quarkus.test.InjectMock;
+import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 
+@QuarkusTest
 @DisplayName("Testes de integração de registro de usuário")
 class RegisterIntegrationTest extends BaseIntegrationTest {
 
@@ -31,10 +33,10 @@ class RegisterIntegrationTest extends BaseIntegrationTest {
     RegisterUC registerUC;
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
 
     @Inject
-    UserDependentRepositoryGTW userDependentRepositoryGTW;
+    UserDependentRepository userDependentRepository;
 
     @Inject
     ListDependentsLinkedUC listDependentsLinkedUC;
@@ -54,7 +56,7 @@ class RegisterIntegrationTest extends BaseIntegrationTest {
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
 
         // Then
-        Optional<UserEntity> savedUser = userRepositoryGTW.findByCpf(userRegisterDTO.getCpf());
+        Optional<UserEntity> savedUser = userRepository.findByCpf(userRegisterDTO.getCpf());
         assertTrue(savedUser.isPresent());
         UserEntity user = savedUser.get();
         assertTrue(user.getActive());
@@ -75,7 +77,7 @@ class RegisterIntegrationTest extends BaseIntegrationTest {
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
 
         // Then
-        Optional<UserEntity> savedUser = userRepositoryGTW.findByCpf(userRegisterDTO.getCpf());
+        Optional<UserEntity> savedUser = userRepository.findByCpf(userRegisterDTO.getCpf());
         assertTrue(savedUser.isPresent());
         UserEntity user = savedUser.get();
         assertFalse(user.getAuthorized());
@@ -96,7 +98,7 @@ class RegisterIntegrationTest extends BaseIntegrationTest {
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
 
         // Then
-        Optional<UserEntity> savedUser = userRepositoryGTW.findByCpf(userRegisterDTO.getCpf());
+        Optional<UserEntity> savedUser = userRepository.findByCpf(userRegisterDTO.getCpf());
         assertTrue(savedUser.isPresent());
         UserEntity minor = savedUser.get();
         assertFalse(minor.getAuthorized());
@@ -112,12 +114,12 @@ class RegisterIntegrationTest extends BaseIntegrationTest {
         assertDoesNotThrow(() -> registerUC.execute(DTOResponsible));
 
         // Then
-        Optional<UserEntity> savedUserResponsible = userRepositoryGTW.findByCpf(DTOResponsible.getCpf());
+        Optional<UserEntity> savedUserResponsible = userRepository.findByCpf(DTOResponsible.getCpf());
         assertTrue(savedUserResponsible.isPresent());
         UserEntity userResponsible = savedUserResponsible.get();
         assertTrue(userResponsible.getActive());
         assertTrue(userResponsible.getAuthorized());
-        Optional<UserDependentEntity> userDependent = userDependentRepositoryGTW.findByUserAndDependent(userResponsible, minor);
+        Optional<UserDependentEntity> userDependent = userDependentRepository.findByUserAndDependent(userResponsible, minor);
         assertTrue(userDependent.isPresent());
 
         // When

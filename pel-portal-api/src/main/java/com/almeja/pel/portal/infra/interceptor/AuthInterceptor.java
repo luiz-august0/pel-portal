@@ -1,7 +1,7 @@
 package com.almeja.pel.portal.infra.interceptor;
 
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.util.StringUtil;
 import com.almeja.pel.portal.infra.context.AuthContext;
 import com.almeja.pel.portal.infra.service.token.TokenService;
@@ -25,7 +25,7 @@ public class AuthInterceptor implements ContainerRequestFilter {
     TokenService tokenService;
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
 
     @Inject
     AuthContext authContext;
@@ -68,7 +68,7 @@ public class AuthInterceptor implements ContainerRequestFilter {
             return;
         }
 
-        Optional<UserEntity> userOptional = userRepositoryGTW.findByCpf(cpf);
+        Optional<UserEntity> userOptional = userRepository.findByCpf(cpf);
         if (userOptional.isEmpty()) {
             ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;

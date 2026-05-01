@@ -3,7 +3,7 @@ package com.almeja.pel.portal.core.mail;
 import com.almeja.pel.portal.core.domain.entity.TemplateEmailEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumTemplateEmail;
 import com.almeja.pel.portal.core.exception.AppException;
-import com.almeja.pel.portal.core.gateway.repository.TemplateEmailRepositoryGTW;
+import com.almeja.pel.portal.core.repository.TemplateEmailRepository;
 import com.almeja.pel.portal.core.mail.interfaces.ITemplate;
 import jakarta.inject.Inject;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,7 +14,7 @@ import java.util.Optional;
 public abstract class MailBuilder<Parameter> {
 
     @Inject
-    private TemplateEmailRepositoryGTW templateEmailRepositoryGTW;
+    TemplateEmailRepository templateEmailRepository;
 
     private final EnumTemplateEmail enumTemplateEmail;
 
@@ -23,7 +23,7 @@ public abstract class MailBuilder<Parameter> {
     }
 
     protected TemplateEmailEntity getTemplateEmail() {
-        Optional<TemplateEmailEntity> optionalTemplateEmail = templateEmailRepositoryGTW.findFirstByTemplateEmail(enumTemplateEmail);
+        Optional<TemplateEmailEntity> optionalTemplateEmail = templateEmailRepository.findFirstByTemplateEmail(enumTemplateEmail);
 
         if (optionalTemplateEmail.isPresent()) {
             return optionalTemplateEmail.get();

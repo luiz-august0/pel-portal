@@ -5,7 +5,7 @@ import com.almeja.pel.portal.core.domain.entity.DocumentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.dto.UserStatusDTO;
-import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
+import com.almeja.pel.portal.core.repository.DocumentRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
@@ -15,11 +15,11 @@ import java.util.List;
 public class GetUserStatusUC {
 
     @Inject
-    DocumentRepositoryGTW documentRepositoryGTW;
+    DocumentRepository documentRepository;
 
     public List<UserStatusDTO> execute(UserEntity user) {
         List<UserStatusDTO> status = new ArrayList<>();
-        List<DocumentEntity> documents = documentRepositoryGTW.findAllByUser(user);
+        List<DocumentEntity> documents = documentRepository.findAllByUser(user);
         if (user.getUserDetails().isMinor())
             status.add(new UserStatusDTO("Link do responsável.", user.getAuthorized()));
         status.add(new UserStatusDTO("Cadastro do endereço.", user.getAddress() != null));

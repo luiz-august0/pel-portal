@@ -8,12 +8,11 @@ import com.almeja.pel.portal.core.dto.DocumentDTO;
 import com.almeja.pel.portal.core.dto.UserDetailsDTO;
 import com.almeja.pel.portal.core.event.dto.EventPortalUserDTO;
 import com.almeja.pel.portal.core.gateway.event.EventProducerGTW;
-import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
+import com.almeja.pel.portal.core.repository.DocumentRepository;
+import com.almeja.pel.portal.core.repository.UserDependentRepository;
 import com.almeja.pel.portal.core.util.ConverterEntityToDTOUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,25 +24,22 @@ public class NotifyCreateUpdatePortalUserEvent {
     EventProducerGTW eventProducerGTW;
 
     @Inject
-    DocumentRepositoryGTW documentRepositoryGTW;
+    DocumentRepository documentRepository;
 
     @Inject
-    UserDependentRepositoryGTW userDependentRepositoryGTW;
-
-    @ConfigProperty(name = "spring.kafka.topics.portal-update-create-user")
-    String eventName;
+    UserDependentRepository userDependentRepository;
 
     public void send(UserEntity user) {
         EventPortalUserDTO eventPortalUser = createEventPortalUser(user);
         if (user.getUserDetails().isMinor()) {
-            Optional<UserDependentEntity> responsible = userDependentRepositoryGTW.findByDependent(user);
+            Optional<UserDependentEntity> responsible = userDependentRepository.findByDependent(user);
             responsible.ifPresent(dependent -> eventPortalUser.setResponsible(createEventPortalUser(dependent.getUser())));
         }
-        eventProducerGTW.send(eventName, eventPortalUser);
+        eventProducerGTW.send("portal-update-create-user", eventPortalUser);
     }
 
     private EventPortalUserDTO createEventPortalUser(UserEntity user) {
-        List<DocumentEntity> documents = documentRepositoryGTW.findAllByUser(user);
+        List<DocumentEntity> documents = documentRepository.findAllByUser(user);
         return EventPortalUserDTO.builder()
                 .id(user.getId())
                 .name(user.getName())

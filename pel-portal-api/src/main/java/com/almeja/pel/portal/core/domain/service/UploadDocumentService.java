@@ -7,7 +7,7 @@ import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.dto.MultipartDTO;
 import com.almeja.pel.portal.core.dto.record.FileUploadedRecord;
 import com.almeja.pel.portal.core.gateway.file.FileHandlerGTW;
-import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
+import com.almeja.pel.portal.core.repository.DocumentRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -17,7 +17,7 @@ public class UploadDocumentService {
     @Inject
     FileHandlerGTW fileHandlerGTW;
     @Inject
-    DocumentRepositoryGTW documentRepositoryGTW;
+    DocumentRepository documentRepository;
     @Inject
     DeleteDocumentService deleteDocumentService;
 
@@ -27,7 +27,7 @@ public class UploadDocumentService {
         DocumentEntity document = new DocumentEntity(user, documentType, multipartDTO.getFilename(), fileUploadedRecord.filename(),
                 fileUploadedRecord.size(), fileUploadedRecord.s3File());
         deleteDocumentService.delete(user, documentType);
-        documentRepositoryGTW.save(document);
+        documentRepository.save(document);
     }
 
 }

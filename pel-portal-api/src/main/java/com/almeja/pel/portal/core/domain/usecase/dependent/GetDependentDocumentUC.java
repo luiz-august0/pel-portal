@@ -6,7 +6,7 @@ import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.domain.service.VerifyDependentService;
 import com.almeja.pel.portal.core.dto.record.DependentVerifiedRecord;
-import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
+import com.almeja.pel.portal.core.repository.DocumentRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.UUID;
@@ -17,11 +17,11 @@ public class GetDependentDocumentUC {
     @Inject
     VerifyDependentService verifyDependentService;
     @Inject
-    DocumentRepositoryGTW documentRepositoryGTW;
+    DocumentRepository documentRepository;
 
     public DocumentEntity execute(UserEntity responsible, UUID userDependentId, EnumDocumentType documentType) {
         DependentVerifiedRecord dependentVerifiedRecord = verifyDependentService.verify(responsible, userDependentId);
-        return documentRepositoryGTW.findByUserAndDocumentType(dependentVerifiedRecord.userDependent(), documentType).orElse(null);
+        return documentRepository.findByUserAndDocumentType(dependentVerifiedRecord.userDependent(), documentType).orElse(null);
     }
 
 }

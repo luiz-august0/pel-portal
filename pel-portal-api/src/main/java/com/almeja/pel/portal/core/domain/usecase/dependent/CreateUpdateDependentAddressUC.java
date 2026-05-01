@@ -7,7 +7,7 @@ import com.almeja.pel.portal.core.domain.service.VerifyDependentService;
 import com.almeja.pel.portal.core.dto.CreateUpdateDependentAddressDTO;
 import com.almeja.pel.portal.core.dto.record.DependentVerifiedRecord;
 import com.almeja.pel.portal.core.exception.AppException;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.CreateUpdateDependentAddressCommand;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
@@ -23,7 +23,7 @@ public class CreateUpdateDependentAddressUC {
     @Inject
     VerifyDependentService verifyDependentService;
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
     @Inject
     Mediator mediator;
 
@@ -34,11 +34,11 @@ public class CreateUpdateDependentAddressUC {
             if (responsible.getAddress() == null)
                 throw new AppException("Responsável não possui endereço cadastrado");
             dependentVerifiedRecord.userDependent().updateAddress((AddressEntity) Hibernate.unproxy(responsible.getAddress()));
-            userRepositoryGTW.save(dependentVerifiedRecord.userDependent());
+            userRepository.save(dependentVerifiedRecord.userDependent());
             mediator.send(new UpdateUserCommand(dependentVerifiedRecord.userDependent()));
         } else {
             dependentVerifiedRecord.userDependent().updateAddress(null);
-            userRepositoryGTW.save(dependentVerifiedRecord.userDependent());
+            userRepository.save(dependentVerifiedRecord.userDependent());
             mediator.send(new CreateUpdateDependentAddressCommand(dependentVerifiedRecord.userDependent(), createUpdateDependentAddressDTO));
         }
     }

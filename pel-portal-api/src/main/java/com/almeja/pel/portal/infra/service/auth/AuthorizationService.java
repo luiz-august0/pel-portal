@@ -7,7 +7,7 @@ import com.almeja.pel.portal.core.dto.record.AuthorizedUserRecord;
 import com.almeja.pel.portal.core.exception.AppException;
 import com.almeja.pel.portal.core.exception.enums.EnumAppException;
 import com.almeja.pel.portal.core.gateway.authorization.AuthorizationGTW;
-import com.almeja.pel.portal.infra.repository.UserRepository;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.infra.service.token.TokenService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

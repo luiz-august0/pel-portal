@@ -1,20 +1,20 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.factory.UserFactory;
 import com.almeja.pel.portal.core.dto.UserUpdateDTO;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class UpdateUserUC {
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
     @Inject
     UserFactory userFactory;
     @Inject
@@ -26,7 +26,7 @@ public class UpdateUserUC {
         userFactory.update(user, userUpdateDTO.getName(), userUpdateDTO.getEmail(), userUpdateDTO.getCpf(),
                 userUpdateDTO.getBirthDate(), userUpdateDTO.getPhone());
         // Salvar usuário atualizado
-        userRepositoryGTW.save(user);
+        userRepository.save(user);
         mediator.send(new UpdateUserCommand(user));
     }
 }

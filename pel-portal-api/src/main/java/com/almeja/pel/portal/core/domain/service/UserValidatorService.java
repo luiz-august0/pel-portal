@@ -1,12 +1,12 @@
 package com.almeja.pel.portal.core.domain.service;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.enums.EnumProgramKnowledgeSource;
 import com.almeja.pel.portal.core.exception.ValidatorException;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.util.CpfUtil;
 import com.almeja.pel.portal.core.util.StringUtil;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.Date;
 import java.util.UUID;
@@ -15,7 +15,7 @@ import java.util.UUID;
 public class UserValidatorService {
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
 
     public void validateName(String name) {
         if (StringUtil.isNullOrEmpty(name)) {
@@ -36,7 +36,7 @@ public class UserValidatorService {
             throw new ValidatorException("Email deve ter um formato válido");
         }
 
-        if (userRepositoryGTW.existsByEmailAndIdIsNot(email, id)) {
+        if (userRepository.existsByEmailAndIdIsNot(email, id)) {
             throw new ValidatorException("Email já está em uso");
         }
     }
@@ -87,7 +87,7 @@ public class UserValidatorService {
             throw new ValidatorException("CPF deve ser valido");
         }
 
-        if (userRepositoryGTW.existsByCpfAndIdIsNot(cpf, id)) {
+        if (userRepository.existsByCpfAndIdIsNot(cpf, id)) {
             throw new ValidatorException("CPF já está em uso");
         }
     }

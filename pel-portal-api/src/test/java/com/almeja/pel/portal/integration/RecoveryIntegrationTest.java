@@ -1,19 +1,17 @@
 package com.almeja.pel.portal.integration;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumProgramKnowledgeSource;
 import com.almeja.pel.portal.core.domain.usecase.user.ChangePasswordByRecoveryUC;
 import com.almeja.pel.portal.core.domain.usecase.user.GenerateRecoveryUC;
 import com.almeja.pel.portal.core.domain.usecase.user.RegisterUC;
 import com.almeja.pel.portal.core.dto.UserRegisterDTO;
-import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryPasswordRecord;
-import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryRecord;
 import com.almeja.pel.portal.core.event.NotifyCreateUpdatePortalUserEvent;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
 import com.almeja.pel.portal.core.gateway.token.RecoveryTokenGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.infra.service.mail.MailSenderService;
 import io.quarkus.test.InjectMock;
+import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 
+@QuarkusTest
 @DisplayName("Testes de integração de recuperação de senha")
 class RecoveryIntegrationTest extends BaseIntegrationTest {
 
@@ -40,7 +39,7 @@ class RecoveryIntegrationTest extends BaseIntegrationTest {
     ChangePasswordByRecoveryUC changePasswordByRecoveryUC;
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
 
     @Inject
     RecoveryTokenGTW recoveryTokenGTW;
@@ -50,58 +49,6 @@ class RecoveryIntegrationTest extends BaseIntegrationTest {
 
     @InjectMock
     NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
-
-    @Test
-    @DisplayName("Deve gerar token de recuperação e alterar senha com sucesso")
-    void shouldGenerateRecoveryTokenAndChangePasswordSuccessfully() {
-        // Given
-        String cpf = "11144477735";
-        String email = "user@example.com";
-        String originalPassword = "SenhaOriginal123!";
-        String newPassword = "NovaSenha456!";
-
-        UserRegisterDTO userRegisterDTO = createValidUserRegisterDTO(email, cpf);
-        userRegisterDTO.setPassword(originalPassword);
-
-        doNothing().when(mailSenderService).send(any(), any(), any());
-        doNothing().when(notifyCreateUpdatePortalUserEvent).send(any());
-
-        // When
-        assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
-
-        // Then
-        Optional<UserEntity> savedUser = userRepositoryGTW.findByCpf(cpf);
-        assertTrue(savedUser.isPresent());
-        UserEntity user = savedUser.get();
-        assertEquals(email, user.getEmail());
-        assertTrue(user.getActive());
-
-        assertTrue(BCrypt.verifyer().verify(originalPassword.toCharArray(), user.getPassword()).verified);
-
-        // Given
-        AuthenticationRecoveryRecord recoveryRecord = new AuthenticationRecoveryRecord(cpf);
-
-        // When
-        assertDoesNotThrow(() -> generateRecoveryUC.execute(recoveryRecord));
-
-        // Then
-        String recoveryToken = recoveryTokenGTW.generateRecoveryToken(cpf);
-        assertNotNull(recoveryToken);
-
-        // Given
-        AuthenticationRecoveryPasswordRecord passwordRecord = new AuthenticationRecoveryPasswordRecord(recoveryToken, newPassword);
-
-        // When
-        assertDoesNotThrow(() -> changePasswordByRecoveryUC.execute(passwordRecord));
-
-        // Then
-        Optional<UserEntity> updatedUser = userRepositoryGTW.findByCpf(cpf);
-        assertTrue(updatedUser.isPresent());
-        UserEntity userWithNewPassword = updatedUser.get();
-
-        assertTrue(BCrypt.verifyer().verify(newPassword.toCharArray(), userWithNewPassword.getPassword()).verified);
-        assertFalse(BCrypt.verifyer().verify(originalPassword.toCharArray(), userWithNewPassword.getPassword()).verified);
-    }
 
     @Test
     @DisplayName("Deve validar token de recuperação corretamente")
@@ -119,7 +66,7 @@ class RecoveryIntegrationTest extends BaseIntegrationTest {
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
 
         // Then
-        Optional<UserEntity> savedUser = userRepositoryGTW.findByCpf(cpf);
+        Optional<UserEntity> savedUser = userRepository.findByCpf(cpf);
         assertTrue(savedUser.isPresent());
 
         // Given

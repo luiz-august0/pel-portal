@@ -6,8 +6,8 @@ import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.event.NotifyCreateUpdatePortalUserEvent;
-import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
+import com.almeja.pel.portal.core.repository.DocumentRepository;
+import com.almeja.pel.portal.core.repository.UserDependentRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -20,21 +20,21 @@ public class VerifyAndNotifyCreateUpdateUserUC {
     @Inject
     NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
     @Inject
-    DocumentRepositoryGTW documentRepositoryGTW;
+    DocumentRepository documentRepository;
     @Inject
-    UserDependentRepositoryGTW userDependentRepositoryGTW;
+    UserDependentRepository userDependentRepository;
 
     @Transactional
     public void execute(UserEntity user) {
         verifyAndNotify(user);
         if (!user.getUserDetails().isMinor()) {
-            List<UserDependentEntity> dependents = userDependentRepositoryGTW.findAllByUser(user);
+            List<UserDependentEntity> dependents = userDependentRepository.findAllByUser(user);
             dependents.forEach((dependent) -> verifyAndNotify(dependent.getDependent()));
         }
     }
 
     private void verifyAndNotify(UserEntity user) {
-        List<EnumDocumentType> documents = documentRepositoryGTW.findAllByUser(user)
+        List<EnumDocumentType> documents = documentRepository.findAllByUser(user)
                 .stream()
                 .map(DocumentEntity::getDocumentType)
                 .toList();

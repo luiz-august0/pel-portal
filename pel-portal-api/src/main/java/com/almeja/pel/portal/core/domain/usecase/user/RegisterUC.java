@@ -1,26 +1,24 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDetailsEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.factory.UserFactory;
 import com.almeja.pel.portal.core.domain.service.UserValidatorService;
 import com.almeja.pel.portal.core.dto.UserRegisterDTO;
-import com.almeja.pel.portal.core.dto.record.AuthorizedLinkGeneratedRecord;
 import com.almeja.pel.portal.core.gateway.crypt.UserCryptPasswordGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
-import com.almeja.pel.portal.core.gateway.token.AuthorizedLinkGTW;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.RegisterUserCommand;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.util.StringUtil;
-import jakarta.transaction.Transactional;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class RegisterUC {
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
     @Inject
     UserCryptPasswordGTW userCryptPasswordGTW;
     @Inject
@@ -42,7 +40,7 @@ public class RegisterUC {
             UserValidatorService.validateProgramKnowledgeSource(userDetails.getProgramKnowledgeSource(), userDetails.getProgramKnowledgeSourceOther());
         }
         boolean generateResponsibleLink = userDetails.isMinor() && StringUtil.isNullOrEmpty(userRegisterDTO.getAuthorizedToken());
-        userRepositoryGTW.save(user);
+        userRepository.save(user);
         // Dispara o command de criação do usuário para validar o link de autorização, vincular dependentes e gerar link de autorização se necessário
         mediator.send(new RegisterUserCommand(user, userRegisterDTO.getAuthorizedToken(), generateResponsibleLink));
     }

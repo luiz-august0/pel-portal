@@ -1,4 +1,4 @@
-package com.almeja.pel.portal.inbound.http.event;
+package com.almeja.pel.portal.inbound.event;
 
 import com.almeja.pel.portal.core.domain.usecase.user.SubmitUserReviewUC;
 import com.almeja.pel.portal.core.event.dto.EventPreRegistrationReviewDTO;

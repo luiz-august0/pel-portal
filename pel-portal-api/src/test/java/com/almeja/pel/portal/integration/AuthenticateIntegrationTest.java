@@ -9,9 +9,10 @@ import com.almeja.pel.portal.core.dto.UserRegisterDTO;
 import com.almeja.pel.portal.core.dto.record.AuthenticateRecord;
 import com.almeja.pel.portal.core.dto.record.AuthenticatedRecord;
 import com.almeja.pel.portal.core.event.NotifyCreateUpdatePortalUserEvent;
-import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserDependentRepository;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import io.quarkus.test.InjectMock;
+import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 
+@QuarkusTest
 @DisplayName("Testes de integração de autenticação")
 class AuthenticateIntegrationTest extends BaseIntegrationTest {
 
@@ -35,10 +37,10 @@ class AuthenticateIntegrationTest extends BaseIntegrationTest {
     AuthenticateUC authenticateUC;
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
 
     @Inject
-    UserDependentRepositoryGTW userDependentRepositoryGTW;
+    UserDependentRepository userDependentRepository;
 
     @InjectMock
     NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
@@ -56,7 +58,7 @@ class AuthenticateIntegrationTest extends BaseIntegrationTest {
         assertDoesNotThrow(() -> registerUC.execute(responsibleRegisterDTO));
 
         // Then
-        Optional<UserEntity> savedResponsible = userRepositoryGTW.findByCpf(responsibleRegisterDTO.getCpf());
+        Optional<UserEntity> savedResponsible = userRepository.findByCpf(responsibleRegisterDTO.getCpf());
         assertTrue(savedResponsible.isPresent());
         UserEntity responsible = savedResponsible.get();
         assertTrue(responsible.getActive());
@@ -71,7 +73,7 @@ class AuthenticateIntegrationTest extends BaseIntegrationTest {
         assertDoesNotThrow(() -> registerUC.execute(minorRegisterDTO));
 
         // Then
-        Optional<UserEntity> savedMinor = userRepositoryGTW.findByCpf(minorRegisterDTO.getCpf());
+        Optional<UserEntity> savedMinor = userRepository.findByCpf(minorRegisterDTO.getCpf());
         assertTrue(savedMinor.isPresent());
         UserEntity minor = savedMinor.get();
         assertFalse(minor.getAuthorized());
@@ -86,7 +88,7 @@ class AuthenticateIntegrationTest extends BaseIntegrationTest {
 
         // Then
         assertNotNull(authenticatedRecord.accessToken());
-        Optional<UserDependentEntity> userDependent = userDependentRepositoryGTW.findByUserAndDependent(responsible, minor);
+        Optional<UserDependentEntity> userDependent = userDependentRepository.findByUserAndDependent(responsible, minor);
         assertTrue(userDependent.isPresent());
     }
 
@@ -103,7 +105,7 @@ class AuthenticateIntegrationTest extends BaseIntegrationTest {
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
 
         // Then
-        Optional<UserEntity> savedUser = userRepositoryGTW.findByCpf(userRegisterDTO.getCpf());
+        Optional<UserEntity> savedUser = userRepository.findByCpf(userRegisterDTO.getCpf());
         assertTrue(savedUser.isPresent());
         UserEntity user = savedUser.get();
         assertTrue(user.getActive());

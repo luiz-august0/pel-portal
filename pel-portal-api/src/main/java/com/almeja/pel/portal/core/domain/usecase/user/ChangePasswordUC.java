@@ -5,7 +5,7 @@ import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.service.UserValidatorService;
 import com.almeja.pel.portal.core.dto.record.ChangePasswordRecord;
 import com.almeja.pel.portal.core.gateway.crypt.UserCryptPasswordGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -13,7 +13,7 @@ import jakarta.transaction.Transactional;
 public class ChangePasswordUC {
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
     @Inject
     UserValidatorService userValidatorService;
     @Inject
@@ -23,7 +23,7 @@ public class ChangePasswordUC {
     public void execute(UserEntity user, ChangePasswordRecord changePasswordRecord) {
         userValidatorService.validatePassword(changePasswordRecord.password());
         user.setPassword(userCryptPasswordGTW.cryptPassword(changePasswordRecord.password()));
-        userRepositoryGTW.save(user);
+        userRepository.save(user);
     }
 
 }

@@ -5,7 +5,7 @@ import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryRecord;
 import com.almeja.pel.portal.core.exception.AppException;
 import com.almeja.pel.portal.core.exception.enums.EnumAppException;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.gateway.token.RecoveryTokenGTW;
 import com.almeja.pel.portal.core.mail.builders.RecoveryMailBuilder;
 import com.almeja.pel.portal.core.mail.interfaces.ITemplate;
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class GenerateRecoveryUC {
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
     @Inject
     RecoveryMailBuilder recoveryMailBuilder;
     @Inject
@@ -28,7 +28,7 @@ public class GenerateRecoveryUC {
     Mediator mediator;
 
     public void execute(AuthenticationRecoveryRecord authenticationRecoveryRecord) {
-        Optional<UserEntity> optionalUser = userRepositoryGTW.findByCpf(authenticationRecoveryRecord.cpf());
+        Optional<UserEntity> optionalUser = userRepository.findByCpf(authenticationRecoveryRecord.cpf());
         if (optionalUser.isEmpty()) throw new AppException(EnumAppException.USER_NOT_FOUND);
         UserEntity user = optionalUser.get();
         if (user.getEmail() == null) throw new AppException(EnumAppException.USER_WITHOUT_EMAIL);

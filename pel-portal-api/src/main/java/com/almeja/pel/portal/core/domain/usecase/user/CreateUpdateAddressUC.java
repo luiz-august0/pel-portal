@@ -1,14 +1,14 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.AddressEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.dto.CreateUpdateAddressDTO;
-import com.almeja.pel.portal.core.gateway.repository.AddressRepositoryGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
+import com.almeja.pel.portal.core.repository.AddressRepository;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.util.UUID;
@@ -17,9 +17,9 @@ import java.util.UUID;
 public class CreateUpdateAddressUC {
 
     @Inject
-    AddressRepositoryGTW addressRepositoryGTW;
+    AddressRepository addressRepository;
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
     @Inject
     Mediator mediator;
 
@@ -42,8 +42,8 @@ public class CreateUpdateAddressUC {
             user.updateAddress(address);
         }
         // Salva endereço e usuário
-        AddressEntity addressSaved = addressRepositoryGTW.save(address);
-        userRepositoryGTW.save(user);
+        AddressEntity addressSaved = addressRepository.save(address);
+        userRepository.save(user);
         mediator.send(new UpdateUserCommand(user));
         return addressSaved.getId();
     }

@@ -5,7 +5,7 @@ import com.almeja.pel.portal.core.domain.entity.DocumentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.gateway.file.FileHandlerGTW;
-import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
+import com.almeja.pel.portal.core.repository.DocumentRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
@@ -17,15 +17,15 @@ public class DeleteDocumentService {
     @Inject
     FileHandlerGTW fileHandlerGTW;
     @Inject
-    DocumentRepositoryGTW documentRepositoryGTW;
+    DocumentRepository documentRepository;
 
     @Transactional
     public void delete(UserEntity user, EnumDocumentType documentType) {
-        Optional<DocumentEntity> oldDocumentOptional = documentRepositoryGTW.findByUserAndDocumentType(user, documentType);
+        Optional<DocumentEntity> oldDocumentOptional = documentRepository.findByUserAndDocumentType(user, documentType);
         if (oldDocumentOptional.isPresent()) {
             DocumentEntity oldDocument = oldDocumentOptional.get();
             fileHandlerGTW.deleteFile(oldDocument.getFilename(), oldDocument.getS3File());
-            documentRepositoryGTW.delete(oldDocument);
+            documentRepository.delete(oldDocument);
         }
     }
 

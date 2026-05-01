@@ -4,7 +4,7 @@ import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.exception.AppException;
 import com.almeja.pel.portal.core.exception.enums.EnumAppException;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.infra.context.AuthContext;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -14,13 +14,13 @@ import java.util.Optional;
 public class GetCurrentUserUC {
 
     @Inject
-    UserRepositoryGTW userRepositoryGTW;
+    UserRepository userRepository;
 
     @Inject
     AuthContext authContext;
 
     public UserEntity execute() {
-        Optional<UserEntity> userOptional = userRepositoryGTW.findById(authContext.getUser().getId());
+        Optional<UserEntity> userOptional = userRepository.findById(authContext.getUser().getId());
         if (userOptional.isEmpty()) {
             throw new AppException("Usuário nao encontrado");
         }
