@@ -1,15 +1,16 @@
-package com.almeja.pel.portal.core.gateway.repository;
+package com.almeja.pel.portal.core.repository;
 
 import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserDependentRepositoryGTW {
-
-    UserDependentEntity save(UserDependentEntity userDependentEntity);
+@Repository
+public interface UserDependentRepository extends JpaRepository<UserDependentEntity, UUID> {
 
     Optional<UserDependentEntity> findByUserAndDependent(UserEntity user, UserEntity dependent);
 

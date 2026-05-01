@@ -9,59 +9,87 @@ import com.almeja.pel.portal.core.dto.UserUpdateDTO;
 import com.almeja.pel.portal.core.dto.record.AuthorizedLinkGeneratedRecord;
 import com.almeja.pel.portal.core.dto.record.ChangePasswordRecord;
 import com.almeja.pel.portal.core.util.ConverterEntityToDTOUtil;
-import com.almeja.pel.portal.inbound.http.interfaces.IUserController;
 import com.almeja.pel.portal.infra.context.AuthContext;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
-@RestController
-public class UserController implements IUserController {
+import static com.almeja.pel.portal.infra.constants.PrefixPathConstant.PREFIX_PATH;
 
-    private final GenerateResponsibleLinkUC generateResponsibleLinkUC;
-    private final UpdateUserUC updateUserUC;
-    private final CreateUpdateAddressUC createUpdateAddressUC;
-    private final UpdateInternalRelationshipTypeUC updateInternalRelationshipTypeUC;
-    private final GetUserStatusUC getUserStatusUC;
-    private final ChangePasswordUC changePasswordUC;
-    private final GetCurrentUserUC getCurrentUserUC;
+@ApplicationScoped
+@Path(PREFIX_PATH + "/user")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class UserController {
 
-    @Override
+    @Inject
+    GenerateResponsibleLinkUC generateResponsibleLinkUC;
+
+    @Inject
+    UpdateUserUC updateUserUC;
+
+    @Inject
+    CreateUpdateAddressUC createUpdateAddressUC;
+
+    @Inject
+    UpdateInternalRelationshipTypeUC updateInternalRelationshipTypeUC;
+
+    @Inject
+    GetUserStatusUC getUserStatusUC;
+
+    @Inject
+    ChangePasswordUC changePasswordUC;
+
+    @Inject
+    GetCurrentUserUC getCurrentUserUC;
+
+    @Inject
+    AuthContext authContext;
+
+    @GET
+    @Path("/current")
     public UserDTO getCurrentUser() {
         return ConverterEntityToDTOUtil.convert(getCurrentUserUC.execute(), UserDTO.class);
     }
 
-    @Override
+    @POST
+    @Path("/regenerate-responsible-link")
     public AuthorizedLinkGeneratedRecord regenerateResponsibleLink() {
-        return generateResponsibleLinkUC.execute(AuthContext.getUser());
+        return generateResponsibleLinkUC.execute(authContext.getUser());
     }
 
-    @Override
+    @PUT
+    @Path("/update")
     public void updateUser(UserUpdateDTO userUpdateDTO) {
-        updateUserUC.execute(AuthContext.getUser(), userUpdateDTO);
+        updateUserUC.execute(authContext.getUser(), userUpdateDTO);
     }
 
-    @Override
-    public void updateInternalRelationshipType(EnumInternalRelationshipType relationshipType) {
-        updateInternalRelationshipTypeUC.execute(AuthContext.getUser(), relationshipType);
+    @PATCH
+    @Path("/update-internal-relationship-type")
+    public void updateInternalRelationshipType(@QueryParam("relationshipType") EnumInternalRelationshipType relationshipType) {
+        updateInternalRelationshipTypeUC.execute(authContext.getUser(), relationshipType);
     }
 
-    @Override
+    @POST
+    @Path("/address")
     public UUID createUpdateAddress(CreateUpdateAddressDTO createUpdateAddressDTO) {
-        return createUpdateAddressUC.execute(AuthContext.getUser(), createUpdateAddressDTO);
+        return createUpdateAddressUC.execute(authContext.getUser(), createUpdateAddressDTO);
     }
 
-    @Override
+    @GET
+    @Path("/status")
     public List<UserStatusDTO> getUserStatus() {
-        return getUserStatusUC.execute(AuthContext.getUser());
+        return getUserStatusUC.execute(authContext.getUser());
     }
 
-    @Override
+    @POST
+    @Path("/change-password")
     public void changePassword(ChangePasswordRecord changePasswordRecord) {
-        changePasswordUC.execute(AuthContext.getUser(), changePasswordRecord);
+        changePasswordUC.execute(authContext.getUser(), changePasswordRecord);
     }
 
 }

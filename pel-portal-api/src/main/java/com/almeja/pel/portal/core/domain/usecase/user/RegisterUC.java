@@ -5,25 +5,26 @@ import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.factory.UserFactory;
 import com.almeja.pel.portal.core.domain.service.UserValidatorService;
 import com.almeja.pel.portal.core.dto.UserRegisterDTO;
-import com.almeja.pel.portal.core.dto.record.AuthorizedLinkGeneratedRecord;
 import com.almeja.pel.portal.core.gateway.crypt.UserCryptPasswordGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
-import com.almeja.pel.portal.core.gateway.token.AuthorizedLinkGTW;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.RegisterUserCommand;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.util.StringUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class RegisterUC {
 
-    private final UserRepositoryGTW userRepositoryGTW;
-    private final UserCryptPasswordGTW userCryptPasswordGTW;
-    private final UserFactory userFactory;
-    private final Mediator mediator;
+    @Inject
+    UserRepository userRepository;
+    @Inject
+    UserCryptPasswordGTW userCryptPasswordGTW;
+    @Inject
+    UserFactory userFactory;
+    @Inject
+    Mediator mediator;
 
     @Transactional
     public void execute(UserRegisterDTO userRegisterDTO) {
@@ -39,7 +40,7 @@ public class RegisterUC {
             UserValidatorService.validateProgramKnowledgeSource(userDetails.getProgramKnowledgeSource(), userDetails.getProgramKnowledgeSourceOther());
         }
         boolean generateResponsibleLink = userDetails.isMinor() && StringUtil.isNullOrEmpty(userRegisterDTO.getAuthorizedToken());
-        userRepositoryGTW.save(user);
+        userRepository.save(user);
         // Dispara o command de criação do usuário para validar o link de autorização, vincular dependentes e gerar link de autorização se necessário
         mediator.send(new RegisterUserCommand(user, userRegisterDTO.getAuthorizedToken(), generateResponsibleLink));
     }

@@ -1,5 +1,6 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.dto.record.AuthenticateRecord;
 import com.almeja.pel.portal.core.dto.record.AuthenticatedRecord;
@@ -9,16 +10,16 @@ import com.almeja.pel.portal.core.exception.enums.EnumAppException;
 import com.almeja.pel.portal.core.gateway.authorization.AuthorizationGTW;
 import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.AuthenticateCommand;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class AuthenticateUC {
 
-    private final Mediator mediator;
-    private final AuthorizationGTW authorizationGTW;
+    @Inject
+    Mediator mediator;
+    @Inject
+    AuthorizationGTW authorizationGTW;
 
     @Transactional
     public AuthenticatedRecord execute(AuthenticateRecord authenticateRecord) {

@@ -1,27 +1,29 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.service.UserValidatorService;
 import com.almeja.pel.portal.core.dto.record.ChangePasswordRecord;
 import com.almeja.pel.portal.core.gateway.crypt.UserCryptPasswordGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.almeja.pel.portal.core.repository.UserRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class ChangePasswordUC {
 
-    private final UserRepositoryGTW userRepositoryGTW;
-    private final UserValidatorService userValidatorService;
-    private final UserCryptPasswordGTW userCryptPasswordGTW;
+    @Inject
+    UserRepository userRepository;
+    @Inject
+    UserValidatorService userValidatorService;
+    @Inject
+    UserCryptPasswordGTW userCryptPasswordGTW;
 
     @Transactional
     public void execute(UserEntity user, ChangePasswordRecord changePasswordRecord) {
         userValidatorService.validatePassword(changePasswordRecord.password());
         user.setPassword(userCryptPasswordGTW.cryptPassword(changePasswordRecord.password()));
-        userRepositoryGTW.save(user);
+        userRepository.save(user);
     }
 
 }

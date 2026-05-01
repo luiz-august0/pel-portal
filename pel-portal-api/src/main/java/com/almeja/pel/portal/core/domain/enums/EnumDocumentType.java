@@ -2,6 +2,7 @@ package com.almeja.pel.portal.core.domain.enums;
 
 import com.almeja.pel.portal.core.domain.entity.UserDetailsEntity;
 import com.almeja.pel.portal.core.domain.enums.base.IEnum;
+import com.almeja.pel.portal.core.domain.enums.base.IEnumConverter;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -28,18 +29,13 @@ public enum EnumDocumentType implements IEnum {
     }
 
     @jakarta.persistence.Converter(autoApply = true)
-    static class Converter extends IEnum.Converter<EnumDocumentType, String> {
+    static class Converter implements IEnumConverter<EnumDocumentType, String> {
 
         @Override
         public EnumDocumentType[] getValues() {
             return EnumDocumentType.values();
         }
 
-    }
-
-    @Override
-    public Class<? extends IEnum.Converter<EnumDocumentType, String>> getConverter() {
-        return EnumDocumentType.Converter.class;
     }
 
 }

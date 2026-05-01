@@ -1,23 +1,25 @@
 package com.almeja.pel.portal.core.domain.service;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.DocumentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.dto.MultipartDTO;
 import com.almeja.pel.portal.core.dto.record.FileUploadedRecord;
 import com.almeja.pel.portal.core.gateway.file.FileHandlerGTW;
-import com.almeja.pel.portal.core.gateway.repository.DocumentRepositoryGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.almeja.pel.portal.core.repository.DocumentRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class UploadDocumentService {
 
-    private final FileHandlerGTW fileHandlerGTW;
-    private final DocumentRepositoryGTW documentRepositoryGTW;
-    private final DeleteDocumentService deleteDocumentService;
+    @Inject
+    FileHandlerGTW fileHandlerGTW;
+    @Inject
+    DocumentRepository documentRepository;
+    @Inject
+    DeleteDocumentService deleteDocumentService;
 
     @Transactional
     public void upload(UserEntity user, EnumDocumentType documentType, MultipartDTO multipartDTO) {
@@ -25,7 +27,7 @@ public class UploadDocumentService {
         DocumentEntity document = new DocumentEntity(user, documentType, multipartDTO.getFilename(), fileUploadedRecord.filename(),
                 fileUploadedRecord.size(), fileUploadedRecord.s3File());
         deleteDocumentService.delete(user, documentType);
-        documentRepositoryGTW.save(document);
+        documentRepository.save(document);
     }
 
 }

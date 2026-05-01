@@ -9,28 +9,27 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-@Service
+@ApplicationScoped
 public class TokenService implements RecoveryTokenGTW {
 
-    @Value("${api.security.token.secret}")
-    private String secret;
+    @ConfigProperty(name = "api.security.token.secret")
+    String secret;
 
-    @Value("${api.security.session-issuer}")
-    private String sessionIssuer;
+    @ConfigProperty(name = "api.security.session-issuer")
+    String sessionIssuer;
 
-    @Value("${api.security.recovery-session-issuer}")
-    private String recoverySessionIssuer;
+    @ConfigProperty(name = "api.security.recovery-session-issuer")
+    String recoverySessionIssuer;
 
-    @Value("${api.security.authorized-link-issuer}")
-    private String authorizedLinkIssuer;
+    @ConfigProperty(name = "api.security.authorized-link-issuer")
+    String authorizedLinkIssuer;
 
     public static final String AUTHORIZED_LINK_TYPE_CLAIM = "authorizedLinkType";
 
@@ -65,7 +64,6 @@ public class TokenService implements RecoveryTokenGTW {
 
     public DecodedJWT validateAuthorizedLinkToken(String token) {
         DecodedJWT decodedJWT = JWT.decode(token);
-        EnumAuthorizedLinkType authorizedLinkType = EnumAuthorizedLinkType.valueOf(decodedJWT.getClaim(AUTHORIZED_LINK_TYPE_CLAIM).asString());
 
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -74,6 +72,7 @@ public class TokenService implements RecoveryTokenGTW {
                     .build()
                     .verify(token);
         } catch (Exception e) {
+            EnumAuthorizedLinkType authorizedLinkType = EnumAuthorizedLinkType.valueOf(decodedJWT.getClaim(AUTHORIZED_LINK_TYPE_CLAIM).asString());
             throw new AppException(authorizedLinkType.equals(EnumAuthorizedLinkType.RESPONSIBLE) ?
                     EnumAppException.EXPIRED_RESPONSIBLE_LINK :
                     EnumAppException.EXPIRED_DEPENDENT_LINK);
@@ -82,12 +81,6 @@ public class TokenService implements RecoveryTokenGTW {
 
     public String getSubject(String token) {
         return JWT.decode(token).getSubject();
-    }
-
-    public String getTokenFromRequest(HttpServletRequest request) {
-        String sessionHeader = request.getHeader("Authorization");
-        if (StringUtil.isNullOrEmpty(sessionHeader)) return null;
-        return sessionHeader.replace("Bearer", "").trim();
     }
 
     private String generateTokenWithIssuer(String cpf, String issuer, Instant expirationDate, EnumAppException errorEnum) {

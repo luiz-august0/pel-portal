@@ -3,18 +3,18 @@ package com.almeja.pel.portal.core.mail;
 import com.almeja.pel.portal.core.domain.entity.TemplateEmailEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumTemplateEmail;
 import com.almeja.pel.portal.core.exception.AppException;
-import com.almeja.pel.portal.core.gateway.repository.TemplateEmailRepositoryGTW;
+import com.almeja.pel.portal.core.repository.TemplateEmailRepository;
 import com.almeja.pel.portal.core.mail.interfaces.ITemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import jakarta.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Optional;
 
-@Component
+@ApplicationScoped
 public abstract class MailBuilder<Parameter> {
 
-    @Autowired
-    private TemplateEmailRepositoryGTW templateEmailRepositoryGTW;
+    @Inject
+    TemplateEmailRepository templateEmailRepository;
 
     private final EnumTemplateEmail enumTemplateEmail;
 
@@ -23,7 +23,7 @@ public abstract class MailBuilder<Parameter> {
     }
 
     protected TemplateEmailEntity getTemplateEmail() {
-        Optional<TemplateEmailEntity> optionalTemplateEmail = templateEmailRepositoryGTW.findFirstByTemplateEmail(enumTemplateEmail);
+        Optional<TemplateEmailEntity> optionalTemplateEmail = templateEmailRepository.findFirstByTemplateEmail(enumTemplateEmail);
 
         if (optionalTemplateEmail.isPresent()) {
             return optionalTemplateEmail.get();

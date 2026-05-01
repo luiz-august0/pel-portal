@@ -1,42 +1,26 @@
 package com.almeja.pel.portal.infra.service.mail;
 
 import com.almeja.pel.portal.core.exception.AppException;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Component;
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.Mailer;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Component
-@RequiredArgsConstructor
+@ApplicationScoped
 public class MailSenderService {
 
-    private final JavaMailSender mailSender;
-
-    @Value("${spring.mail.username}")
-    private String senderEmail;
+    @Inject
+    Mailer mailer;
 
     public void send(String to, String subject, String html) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-
-            message.setSubject(subject);
-
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-            helper.setFrom(senderEmail);
-            helper.setTo(to);
-            helper.setText(html, true);
-
-            mailSender.send(message);
-        } catch (MessagingException messagingException) {
-            Logger.getLogger(MailSenderService.class.getName()).log(Level.SEVERE, messagingException.getMessage());
-            throw new AppException("Erro ao enviar email: " + messagingException.getMessage());
+            mailer.send(Mail.withHtml(to, subject, html));
+        } catch (Exception e) {
+            Logger.getLogger(MailSenderService.class.getName()).log(Level.SEVERE, e.getMessage());
+            throw new AppException("Erro ao enviar email: " + e.getMessage());
         }
     }
 

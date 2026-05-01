@@ -1,19 +1,20 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.dto.record.AuthorizedLinkGeneratedRecord;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.gateway.token.AuthorizedLinkGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class GenerateResponsibleLinkUC {
 
-    private final AuthorizedLinkGTW authorizedLinkGTW;
-    private final UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    AuthorizedLinkGTW authorizedLinkGTW;
+    @Inject
+    UserRepository userRepository;
 
     @Transactional
     public AuthorizedLinkGeneratedRecord execute(UserEntity user) {
@@ -22,7 +23,7 @@ public class GenerateResponsibleLinkUC {
         user.setResponsibleToken(authorizedLinkGeneratedRecord.token());
         user.setResponsibleTokenGeneratedAt(authorizedLinkGeneratedRecord.generatedAt());
         user.setResponsibleTokenExpiresAt(authorizedLinkGeneratedRecord.expires());
-        userRepositoryGTW.save(user);
+        userRepository.save(user);
         return authorizedLinkGeneratedRecord;
     }
 

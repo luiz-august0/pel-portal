@@ -1,26 +1,28 @@
 package com.almeja.pel.portal.core.domain.usecase.dependent;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumAuthorizedLinkType;
 import com.almeja.pel.portal.core.dto.record.AuthorizedTokenRecord;
 import com.almeja.pel.portal.core.exception.AppException;
 import com.almeja.pel.portal.core.exception.ValidatorException;
-import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserDependentRepository;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.gateway.token.AuthorizedLinkGTW;
 import com.almeja.pel.portal.core.util.StringUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class LinkDependentUC {
 
-    private final AuthorizedLinkGTW authorizedLinkGTW;
-    private final UserRepositoryGTW userRepositoryGTW;
-    private final UserDependentRepositoryGTW userDependentRepositoryGTW;
+    @Inject
+    AuthorizedLinkGTW authorizedLinkGTW;
+    @Inject
+    UserRepository userRepository;
+    @Inject
+    UserDependentRepository userDependentRepository;
 
     @Transactional
     public void execute(UserEntity user, String authorizedToken) {
@@ -29,7 +31,7 @@ public class LinkDependentUC {
         }
 
         AuthorizedTokenRecord authorizedTokenRecord = authorizedLinkGTW.validateToken(authorizedToken);
-        UserEntity userThatSendLink = userRepositoryGTW.findByCpf(authorizedTokenRecord.cpf())
+        UserEntity userThatSendLink = userRepository.findByCpf(authorizedTokenRecord.cpf())
                 .orElseThrow(() -> new AppException("Usuário que enviou o link não foi encontrado"));
 
         if (authorizedTokenRecord.authorizedLinkType().equals(EnumAuthorizedLinkType.RESPONSIBLE)) {
@@ -46,8 +48,8 @@ public class LinkDependentUC {
         minor.setResponsibleToken(null);
         minor.setResponsibleTokenGeneratedAt(null);
         minor.setResponsibleTokenExpiresAt(null);
-        userRepositoryGTW.save(responsible);
-        userRepositoryGTW.save(minor);
+        userRepository.save(responsible);
+        userRepository.save(minor);
         saveDependent(responsible, minor);
     }
 
@@ -59,16 +61,16 @@ public class LinkDependentUC {
         minor.setResponsibleTokenGeneratedAt(null);
         minor.setResponsibleTokenExpiresAt(null);
         minor.setAuthorized(true);
-        userRepositoryGTW.save(minor);
+        userRepository.save(minor);
         saveDependent(responsible, minor);
     }
 
     private boolean alreadyLinked(UserEntity minor, UserEntity responsible) {
-        return userDependentRepositoryGTW.findByUserAndDependent(responsible, minor).isPresent();
+        return userDependentRepository.findByUserAndDependent(responsible, minor).isPresent();
     }
 
     private void saveDependent(UserEntity user, UserEntity dependent) {
-        userDependentRepositoryGTW.save(new UserDependentEntity(user, dependent, true));
+        userDependentRepository.save(new UserDependentEntity(user, dependent, true));
     }
 
     private void validateResponsibleIsOfLegalAge(UserEntity responsible) {

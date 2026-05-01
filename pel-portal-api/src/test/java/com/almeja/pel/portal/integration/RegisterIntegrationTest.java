@@ -8,12 +8,13 @@ import com.almeja.pel.portal.core.domain.usecase.user.RegisterUC;
 import com.almeja.pel.portal.core.dto.DependentsLinkedListDTO;
 import com.almeja.pel.portal.core.dto.UserRegisterDTO;
 import com.almeja.pel.portal.core.event.NotifyCreateUpdatePortalUserEvent;
-import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserDependentRepository;
+import com.almeja.pel.portal.core.repository.UserRepository;
+import io.quarkus.test.InjectMock;
+import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -24,23 +25,24 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 
-@DisplayName("Testes de integração de registro de usuário")
+@QuarkusTest
+@DisplayName("Testes de integração de registro de usuário")
 class RegisterIntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private RegisterUC registerUC;
+    @Inject
+    RegisterUC registerUC;
 
-    @Autowired
-    private UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    UserRepository userRepository;
 
-    @Autowired
-    private UserDependentRepositoryGTW userDependentRepositoryGTW;
+    @Inject
+    UserDependentRepository userDependentRepository;
 
-    @Autowired
-    private ListDependentsLinkedUC listDependentsLinkedUC;
+    @Inject
+    ListDependentsLinkedUC listDependentsLinkedUC;
 
-    @MockitoBean
-    private NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
+    @InjectMock
+    NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
 
     @Test
     @DisplayName("Deve registrar um usuário adulto com sucesso")
@@ -49,17 +51,16 @@ class RegisterIntegrationTest extends BaseIntegrationTest {
         UserRegisterDTO userRegisterDTO = createValidUserRegisterDTO("adult@example.com", "11144477735");
         userRegisterDTO.setBirthDate(Date.from(LocalDate.now().minusYears(25).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-        // Mock do notifyCreateUpdatePortalUserEvent para não enviar evento
         doNothing().when(notifyCreateUpdatePortalUserEvent).send(any());
         // When
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
 
         // Then
-        Optional<UserEntity> savedUser = userRepositoryGTW.findByCpf(userRegisterDTO.getCpf());
+        Optional<UserEntity> savedUser = userRepository.findByCpf(userRegisterDTO.getCpf());
         assertTrue(savedUser.isPresent());
         UserEntity user = savedUser.get();
         assertTrue(user.getActive());
-        assertTrue(user.getAuthorized()); // Deve estar autorizado
+        assertTrue(user.getAuthorized());
         assertNotNull(user.getPassword());
     }
 
@@ -70,45 +71,41 @@ class RegisterIntegrationTest extends BaseIntegrationTest {
         UserRegisterDTO userRegisterDTO = createValidUserRegisterDTO("minor@example.com", "22255588846");
         userRegisterDTO.setBirthDate(Date.from(LocalDate.now().minusYears(16).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-        // Mock do notifyCreateUpdatePortalUserEvent para não enviar evento
         doNothing().when(notifyCreateUpdatePortalUserEvent).send(any());
 
         // When
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
 
         // Then
-        Optional<UserEntity> savedUser = userRepositoryGTW.findByCpf(userRegisterDTO.getCpf());
+        Optional<UserEntity> savedUser = userRepository.findByCpf(userRegisterDTO.getCpf());
         assertTrue(savedUser.isPresent());
         UserEntity user = savedUser.get();
-        assertFalse(user.getAuthorized()); // Menor nao deve estar autorizado
+        assertFalse(user.getAuthorized());
         assertTrue(user.getActive());
-        assertNotNull(user.getResponsibleToken()); // Deve ter gerado o link para o responsável
+        assertNotNull(user.getResponsibleToken());
     }
 
     @Test
-    @DisplayName("Deve registrar um usuário responsavel com link enviado pelo usúario menor")
+    @DisplayName("Deve registrar um usuário responsavel com link enviado pelo usúario menor")
     void shouldRegisterResponsibleUser() {
         // Given
-        // Registra o menor
         UserRegisterDTO userRegisterDTO = createValidUserRegisterDTO("minor2@example.com", "54403121020");
         userRegisterDTO.setBirthDate(Date.from(LocalDate.now().minusYears(16).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-        // Mock do notifyCreateUpdatePortalUserEvent para não enviar evento
         doNothing().when(notifyCreateUpdatePortalUserEvent).send(any());
 
         // When
         assertDoesNotThrow(() -> registerUC.execute(userRegisterDTO));
 
         // Then
-        Optional<UserEntity> savedUser = userRepositoryGTW.findByCpf(userRegisterDTO.getCpf());
+        Optional<UserEntity> savedUser = userRepository.findByCpf(userRegisterDTO.getCpf());
         assertTrue(savedUser.isPresent());
         UserEntity minor = savedUser.get();
-        assertFalse(minor.getAuthorized()); // Menor nao deve estar autorizado
+        assertFalse(minor.getAuthorized());
         assertTrue(minor.getActive());
-        assertNotNull(minor.getResponsibleToken()); // Deve ter gerado o link para o responsável
+        assertNotNull(minor.getResponsibleToken());
 
         // Given
-        // Registra o responsável
         UserRegisterDTO DTOResponsible = createValidUserRegisterDTO("adult2@example.com", "06236654093");
         DTOResponsible.setBirthDate(Date.from(LocalDate.now().minusYears(25).atStartOfDay(ZoneId.systemDefault()).toInstant()));
         DTOResponsible.setAuthorizedToken(minor.getResponsibleToken());
@@ -117,19 +114,18 @@ class RegisterIntegrationTest extends BaseIntegrationTest {
         assertDoesNotThrow(() -> registerUC.execute(DTOResponsible));
 
         // Then
-        Optional<UserEntity> savedUserResponsible = userRepositoryGTW.findByCpf(DTOResponsible.getCpf());
+        Optional<UserEntity> savedUserResponsible = userRepository.findByCpf(DTOResponsible.getCpf());
         assertTrue(savedUserResponsible.isPresent());
         UserEntity userResponsible = savedUserResponsible.get();
         assertTrue(userResponsible.getActive());
-        assertTrue(userResponsible.getAuthorized()); // Responsável deve estar autorizado
-        Optional<UserDependentEntity> userDependent = userDependentRepositoryGTW.findByUserAndDependent(userResponsible, minor);
-        assertTrue(userDependent.isPresent()); // Verifica se o menor foi vinculado ao responsável
+        assertTrue(userResponsible.getAuthorized());
+        Optional<UserDependentEntity> userDependent = userDependentRepository.findByUserAndDependent(userResponsible, minor);
+        assertTrue(userDependent.isPresent());
 
         // When
         DependentsLinkedListDTO dependents = listDependentsLinkedUC.execute(userResponsible);
 
         // Then
-        // Verifica se o menor foi adicionado na lista de pendentes dos dependentes
         assertEquals(1, dependents.getPending().size());
     }
 

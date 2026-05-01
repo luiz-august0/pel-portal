@@ -4,23 +4,32 @@ import com.almeja.pel.portal.core.domain.usecase.user.ChangePasswordByRecoveryUC
 import com.almeja.pel.portal.core.domain.usecase.user.GenerateRecoveryUC;
 import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryPasswordRecord;
 import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryRecord;
-import com.almeja.pel.portal.inbound.http.interfaces.IAuthenticationRecoveryController;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 
-@RequiredArgsConstructor
-@RestController
-public class AuthenticationRecoveryController implements IAuthenticationRecoveryController {
+import static com.almeja.pel.portal.infra.constants.PrefixPathConstant.PREFIX_PATH;
 
-    private final GenerateRecoveryUC generateRecoveryUC;
-    private final ChangePasswordByRecoveryUC changePasswordByRecoveryUC;
+@ApplicationScoped
+@Path(PREFIX_PATH + "/auth/recovery")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class AuthenticationRecoveryController {
 
-    @Override
+    @Inject
+    GenerateRecoveryUC generateRecoveryUC;
+
+    @Inject
+    ChangePasswordByRecoveryUC changePasswordByRecoveryUC;
+
+    @POST
     public void generateRecovery(AuthenticationRecoveryRecord authenticationRecoveryRecord) {
         generateRecoveryUC.execute(authenticationRecoveryRecord);
     }
 
-    @Override
+    @POST
+    @Path("/password")
     public void changePassword(AuthenticationRecoveryPasswordRecord authenticationRecoveryPasswordRecord) {
         changePasswordByRecoveryUC.execute(authenticationRecoveryPasswordRecord);
     }

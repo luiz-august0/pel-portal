@@ -1,26 +1,28 @@
 package com.almeja.pel.portal.core.domain.usecase.dependent;
 
+import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.factory.UserFactory;
 import com.almeja.pel.portal.core.dto.DependentCreateDTO;
 import com.almeja.pel.portal.core.exception.ValidatorException;
-import com.almeja.pel.portal.core.gateway.repository.UserDependentRepositoryGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserDependentRepository;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.util.DateUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class CreateDependentUC {
 
-    private final UserDependentRepositoryGTW userDependentRepositoryGTW;
-    private final UserFactory userFactory;
-    private final UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    UserDependentRepository userDependentRepository;
+    @Inject
+    UserFactory userFactory;
+    @Inject
+    UserRepository userRepository;
 
     @Transactional
     public UUID execute(UserEntity responsible, DependentCreateDTO dependentCreateDTO) {
@@ -33,8 +35,8 @@ public class CreateDependentUC {
         if (DateUtil.getAge(dependent.getUserDetails().getBirthDate()) >= 18) {
             throw new ValidatorException("Dependente deve ser menor de idade");
         }
-        UserEntity dependentSaved = userRepositoryGTW.save(dependent);
-        userDependentRepositoryGTW.save(new UserDependentEntity(responsible, dependent, false));
+        UserEntity dependentSaved = userRepository.save(dependent);
+        userDependentRepository.save(new UserDependentEntity(responsible, dependent, false));
         return dependentSaved.getId();
     }
 

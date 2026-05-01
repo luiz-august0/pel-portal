@@ -1,59 +1,80 @@
 package com.almeja.pel.portal.infra.interceptor;
 
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
+import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.util.StringUtil;
 import com.almeja.pel.portal.infra.context.AuthContext;
 import com.almeja.pel.portal.infra.service.token.TokenService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
+import jakarta.annotation.Priority;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 import java.util.Optional;
 
-/**
- * Interceptor responsável por setar o usuário autenticado no AuthContext
- * para cada requisição que contenha um token JWT válido.
- */
-@Component
-@RequiredArgsConstructor
-public class AuthInterceptor implements HandlerInterceptor {
+@Provider
+@Priority(Priorities.AUTHENTICATION)
+@ApplicationScoped
+public class AuthInterceptor implements ContainerRequestFilter {
 
-    private final TokenService tokenService;
-    private final UserRepositoryGTW userRepositoryGTW;
+    @Inject
+    TokenService tokenService;
+
+    @Inject
+    UserRepository userRepository;
+
+    @Inject
+    AuthContext authContext;
+
+    private static final String[] EXCLUDED_PATHS = {
+            "/auth", "/v3/api-docs", "/swagger-ui", "/openapi", "/q/health", "/q/openapi"
+    };
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        // Extrair token da requisição
-        String token = tokenService.getTokenFromRequest(request);
-        if (StringUtil.isNotNullOrEmpty(token)) {
-            // Extrair CPF
-            String cpf = tokenService.getSubject(token);
-            if (StringUtil.isNotNullOrEmpty(cpf)) {
-                // Buscar usuário pelo CPF
-                Optional<UserEntity> userOptional = userRepositoryGTW.findByCpf(cpf);
-                if (userOptional.isPresent()) {
-                    // Setar usuário no AuthContext
-                    AuthContext.setUser(userOptional.get());
-                    return true;
-                }
+    public void filter(ContainerRequestContext ctx) {
+        String path = ctx.getUriInfo().getPath();
+
+        for (String excluded : EXCLUDED_PATHS) {
+            if (path.contains(excluded)) {
+                return;
             }
         }
-        return false;
-    }
 
-    // Limpar o AuthContext após o processamento da requisição
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        AuthContext.clear();
-    }
+        String authHeader = ctx.getHeaderString("Authorization");
+        if (StringUtil.isNullOrEmpty(authHeader)) {
+            ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
+        }
 
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        AuthContext.clear();
+        String token = authHeader.replace("Bearer", "").trim();
+        if (StringUtil.isNullOrEmpty(token)) {
+            ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
+        }
+
+        String cpf;
+        try {
+            cpf = tokenService.getSubject(token);
+        } catch (Exception e) {
+            ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
+        }
+        if (StringUtil.isNullOrEmpty(cpf)) {
+            ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
+        }
+
+        Optional<UserEntity> userOptional = userRepository.findByCpf(cpf);
+        if (userOptional.isEmpty()) {
+            ctx.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            return;
+        }
+
+        authContext.setUser(userOptional.get());
     }
 
 }

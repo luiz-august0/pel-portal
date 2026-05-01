@@ -7,10 +7,10 @@ import com.almeja.pel.portal.core.exception.ValidatorException;
 import com.almeja.pel.portal.core.gateway.file.FileHandlerGTW;
 import com.almeja.pel.portal.infra.service.aws.s3.S3StorageService;
 import com.almeja.pel.portal.infra.util.FileUtil;
-import lombok.RequiredArgsConstructor;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,25 +20,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 @Slf4j
 public class FileHandlerService implements FileHandlerGTW {
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    @ConfigProperty(name = "file.upload-dir")
+    String uploadDir;
 
-    @Value("${file.s3-enabled}")
-    private boolean s3Enabled;
+    @ConfigProperty(name = "file.s3-enabled")
+    boolean s3Enabled;
 
-    @Value("${file.upload-size}")
-    private String uploadSize;
+    @ConfigProperty(name = "file.upload-size")
+    String uploadSize;
 
-    private final S3StorageService s3StorageService;
+    @Inject
+    S3StorageService s3StorageService;
 
     @Override
     public FileUploadedRecord uploadFile(MultipartDTO multipartDTO) {
-        // Validar arquivo
         validateFile(multipartDTO);
         BigDecimal fileSize = BigDecimal.valueOf(getFileSizeInBytes(multipartDTO));
         try {
@@ -74,7 +73,6 @@ public class FileHandlerService implements FileHandlerGTW {
     @Override
     public byte[] getFile(String filename, boolean fromS3) {
         log.info("Buscando arquivo: {}", filename);
-        // Validar nome do arquivo
         if (filename == null || filename.trim().isEmpty())
             throw new ValidatorException("Nome do arquivo é obrigatório");
         try {
@@ -93,7 +91,6 @@ public class FileHandlerService implements FileHandlerGTW {
 
     private String uploadToLocal(MultipartDTO multipartDTO) {
         try {
-            // Criar diretório se não existir
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
@@ -101,7 +98,6 @@ public class FileHandlerService implements FileHandlerGTW {
             }
             String filename = FileUtil.generateUniqueFilename(multipartDTO.getFilename());
             Path filePath = uploadPath.resolve(filename);
-            // Salvar arquivo no sistema de arquivos local
             File file = filePath.toFile();
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 fos.write(multipartDTO.getBytes());
@@ -152,9 +148,7 @@ public class FileHandlerService implements FileHandlerGTW {
         if (multipartDTO.getFile() == null || multipartDTO.getFile().trim().isEmpty()) {
             throw new ValidatorException("Conteúdo do arquivo é obrigatório");
         }
-        // Validar tamanho do arquivo
         validateFileSize(multipartDTO);
-        // Validar extensão do arquivo
         String filename = multipartDTO.getFilename().toLowerCase();
         if (!isValidFileExtension(filename)) {
             throw new ValidatorException("Tipo de arquivo não permitido");
@@ -178,7 +172,7 @@ public class FileHandlerService implements FileHandlerGTW {
 
     private long parseUploadSize() {
         if (uploadSize == null || uploadSize.trim().isEmpty()) {
-            return 10 * 1024 * 1024; // 10MB padrão
+            return 10 * 1024 * 1024;
         }
         String size = uploadSize.trim().toUpperCase();
         long multiplier = 1;
@@ -196,7 +190,7 @@ public class FileHandlerService implements FileHandlerGTW {
             return Long.parseLong(size.trim()) * multiplier;
         } catch (NumberFormatException e) {
             log.warn("Formato de tamanho de arquivo inválido: {}. Usando padrão de 10MB", uploadSize);
-            return 10 * 1024 * 1024; // 10MB padrão
+            return 10 * 1024 * 1024;
         }
     }
 
@@ -223,5 +217,3 @@ public class FileHandlerService implements FileHandlerGTW {
     }
 
 }
-
-

@@ -6,28 +6,31 @@ import com.almeja.pel.portal.core.dto.record.AuthenticationRecoveryPasswordRecor
 import com.almeja.pel.portal.core.exception.AppException;
 import com.almeja.pel.portal.core.exception.enums.EnumAppException;
 import com.almeja.pel.portal.core.gateway.crypt.UserCryptPasswordGTW;
-import com.almeja.pel.portal.core.gateway.repository.UserRepositoryGTW;
 import com.almeja.pel.portal.core.gateway.token.RecoveryTokenGTW;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.almeja.pel.portal.core.repository.UserRepository;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class ChangePasswordByRecoveryUC {
 
-    private final UserRepositoryGTW userRepositoryGTW;
-    private final UserValidatorService userValidatorService;
-    private final UserCryptPasswordGTW userCryptPasswordGTW;
-    private final RecoveryTokenGTW recoveryTokenGTW;
+    @Inject
+    UserRepository userRepository;
+    @Inject
+    UserValidatorService userValidatorService;
+    @Inject
+    UserCryptPasswordGTW userCryptPasswordGTW;
+    @Inject
+    RecoveryTokenGTW recoveryTokenGTW;
 
     @Transactional
     public void execute(AuthenticationRecoveryPasswordRecord authenticationRecoveryPasswordRecord) {
         userValidatorService.validatePassword(authenticationRecoveryPasswordRecord.password());
         String cpf = recoveryTokenGTW.validateRecoveryToken(authenticationRecoveryPasswordRecord.token());
-        UserEntity user = userRepositoryGTW.findByCpf(cpf).orElseThrow(() -> new AppException(EnumAppException.USER_NOT_FOUND));
+        UserEntity user = userRepository.findByCpf(cpf).orElseThrow(() -> new AppException(EnumAppException.USER_NOT_FOUND));
         user.setPassword(userCryptPasswordGTW.cryptPassword(authenticationRecoveryPasswordRecord.password()));
-        userRepositoryGTW.save(user);
+        userRepository.save(user);
     }
 
 }
