@@ -1,6 +1,7 @@
 package com.almeja.pel.portal.core.domain.enums;
 
 import com.almeja.pel.portal.core.domain.enums.base.IEnum;
+import com.almeja.pel.portal.core.domain.enums.base.IEnumConverter;
 import lombok.Getter;
 
 @Getter
@@ -21,18 +22,13 @@ public enum EnumInternalRelationshipType implements IEnum {
     }
 
     @jakarta.persistence.Converter(autoApply = true)
-    static class Converter extends IEnum.Converter<EnumInternalRelationshipType, String> {
+    static class Converter implements IEnumConverter<EnumInternalRelationshipType, String> {
 
         @Override
         public EnumInternalRelationshipType[] getValues() {
             return EnumInternalRelationshipType.values();
         }
 
-    }
-
-    @Override
-    public Class<? extends IEnum.Converter<EnumInternalRelationshipType, String>> getConverter() {
-        return EnumInternalRelationshipType.Converter.class;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.almeja.pel.portal.core.domain.enums;
 
 import com.almeja.pel.portal.core.domain.enums.base.IEnum;
+import com.almeja.pel.portal.core.domain.enums.base.IEnumConverter;
 import lombok.Getter;
 
 @Getter
@@ -22,18 +23,13 @@ public enum EnumProgramKnowledgeSource implements IEnum {
     }
 
     @jakarta.persistence.Converter(autoApply = true)
-    static class Converter extends IEnum.Converter<EnumProgramKnowledgeSource, String> {
+    static class Converter implements IEnumConverter<EnumProgramKnowledgeSource, String> {
 
         @Override
         public EnumProgramKnowledgeSource[] getValues() {
             return EnumProgramKnowledgeSource.values();
         }
 
-    }
-
-    @Override
-    public Class<? extends IEnum.Converter<EnumProgramKnowledgeSource, String>> getConverter() {
-        return EnumProgramKnowledgeSource.Converter.class;
     }
 
 }

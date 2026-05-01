@@ -1,6 +1,7 @@
 package com.almeja.pel.portal.core.domain.enums;
 
 import com.almeja.pel.portal.core.domain.enums.base.IEnum;
+import com.almeja.pel.portal.core.domain.enums.base.IEnumConverter;
 import lombok.Getter;
 
 @Getter
@@ -21,18 +22,13 @@ public enum EnumTemplateEmail implements IEnum {
     }
 
     @jakarta.persistence.Converter(autoApply = true)
-    static class Converter extends IEnum.Converter<EnumTemplateEmail, String> {
+    static class Converter implements IEnumConverter<EnumTemplateEmail, String> {
 
         @Override
         public EnumTemplateEmail[] getValues() {
             return EnumTemplateEmail.values();
         }
 
-    }
-
-    @Override
-    public Class<? extends IEnum.Converter<EnumTemplateEmail, String>> getConverter() {
-        return Converter.class;
     }
 
 }
