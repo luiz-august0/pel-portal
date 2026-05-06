@@ -4,7 +4,6 @@ import com.almeja.pel.portal.core.gateway.event.EventProducerGTW;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.smallrye.reactive.messaging.kafka.api.OutgoingKafkaRecordMetadata;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
@@ -14,12 +13,14 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 @Slf4j
 public class KafkaEventProducerService implements EventProducerGTW {
 
-    @Inject
-    @Channel("kafka-producer")
-    Emitter<String> emitter;
+    private final Emitter<String> emitter;
+    private final ObjectMapper objectMapper;
 
-    @Inject
-    ObjectMapper objectMapper;
+    public KafkaEventProducerService(@Channel("kafka-producer") Emitter<String> emitter,
+                                     ObjectMapper objectMapper) {
+        this.emitter = emitter;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public void send(String topicName, Object payload) {

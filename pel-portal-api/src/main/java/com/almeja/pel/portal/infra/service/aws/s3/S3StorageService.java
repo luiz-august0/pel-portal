@@ -4,7 +4,7 @@ import com.almeja.pel.portal.core.dto.MultipartDTO;
 import com.almeja.pel.portal.core.exception.AppException;
 import com.almeja.pel.portal.infra.util.FileUtil;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -12,16 +12,15 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.File;
-import java.io.IOException;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class S3StorageService {
 
     @ConfigProperty(name = "cloud.aws.s3.bucket-name")
     String bucketName;
 
-    @Inject
-    S3Client s3Client;
+    private final S3Client s3Client;
 
     public String upload(MultipartDTO multipartDTO, Boolean isPublic) {
         File fileObj = FileUtil.convertMultipartBeanToFile(multipartDTO);

@@ -10,32 +10,24 @@ import com.almeja.pel.portal.core.dto.MultipartDTO;
 import com.almeja.pel.portal.core.util.ConverterEntityToDTOUtil;
 import com.almeja.pel.portal.infra.context.AuthContext;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import lombok.RequiredArgsConstructor;
 
 import static com.almeja.pel.portal.infra.constants.PrefixPathConstant.PREFIX_PATH;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 @Path(PREFIX_PATH + "/document")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DocumentController {
 
-    @Inject
-    UploadDocumentUC uploadDocumentUC;
-
-    @Inject
-    DeleteDocumentUC deleteDocumentUC;
-
-    @Inject
-    GetDocumentUC getDocumentUC;
-
-    @Inject
-    DownloadDocumentUC downloadDocumentUC;
-
-    @Inject
-    AuthContext authContext;
+    private final UploadDocumentUC uploadDocumentUC;
+    private final DeleteDocumentUC deleteDocumentUC;
+    private final GetDocumentUC getDocumentUC;
+    private final DownloadDocumentUC downloadDocumentUC;
+    private final AuthContext authContext;
 
     @POST
     @Path("/upload")

@@ -1,18 +1,18 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class SubmitUserReviewUC {
 
-    @Inject
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public void execute(String cpf, boolean approved) {

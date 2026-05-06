@@ -8,7 +8,7 @@ import com.almeja.pel.portal.core.gateway.file.FileHandlerGTW;
 import com.almeja.pel.portal.infra.service.aws.s3.S3StorageService;
 import com.almeja.pel.portal.infra.util.FileUtil;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 
 @ApplicationScoped
 @Slf4j
+@RequiredArgsConstructor
 public class FileHandlerService implements FileHandlerGTW {
 
     @ConfigProperty(name = "file.upload-dir")
@@ -33,8 +34,7 @@ public class FileHandlerService implements FileHandlerGTW {
     @ConfigProperty(name = "file.upload-size")
     String uploadSize;
 
-    @Inject
-    S3StorageService s3StorageService;
+    private final S3StorageService s3StorageService;
 
     @Override
     public FileUploadedRecord uploadFile(MultipartDTO multipartDTO) {

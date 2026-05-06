@@ -4,13 +4,13 @@ import com.almeja.pel.portal.core.domain.usecase.user.VerifyAndNotifyCreateUpdat
 import com.almeja.pel.portal.core.mediator.CommandHandler;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class UpdateUserCommandHandler implements CommandHandler<UpdateUserCommand, Void> {
 
-    @Inject
-    VerifyAndNotifyCreateUpdateUserUC verifyAndNotifyCreateUpdateUserUC;
+    private final VerifyAndNotifyCreateUpdateUserUC verifyAndNotifyCreateUpdateUserUC;
 
     @Override
     public Void handle(UpdateUserCommand command) {

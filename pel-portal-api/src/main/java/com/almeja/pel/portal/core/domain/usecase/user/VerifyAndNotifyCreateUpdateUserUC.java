@@ -1,6 +1,5 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.DocumentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
@@ -10,19 +9,18 @@ import com.almeja.pel.portal.core.repository.DocumentRepository;
 import com.almeja.pel.portal.core.repository.UserDependentRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
 import java.util.List;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class VerifyAndNotifyCreateUpdateUserUC {
 
-    @Inject
-    NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
-    @Inject
-    DocumentRepository documentRepository;
-    @Inject
-    UserDependentRepository userDependentRepository;
+    private final NotifyCreateUpdatePortalUserEvent notifyCreateUpdatePortalUserEvent;
+    private final DocumentRepository documentRepository;
+    private final UserDependentRepository userDependentRepository;
 
     @Transactional
     public void execute(UserEntity user) {

@@ -4,16 +4,16 @@ import com.almeja.pel.portal.core.exception.AppException;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class MailSenderService {
 
-    @Inject
-    Mailer mailer;
+    private final Mailer mailer;
 
     public void send(String to, String subject, String html) {
         try {

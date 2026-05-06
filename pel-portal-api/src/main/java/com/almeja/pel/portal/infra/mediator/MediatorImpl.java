@@ -7,7 +7,6 @@ import com.almeja.pel.portal.core.mediator.Mediator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
-import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.ParameterizedType;
@@ -19,16 +18,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class MediatorImpl implements Mediator {
 
-    @Inject
-    @Any
-    Instance<CommandHandler<?, ?>> handlers;
-
-    @Inject
-    @Any
-    Instance<AsyncCommandHandler<?, ?>> asyncHandlers;
+    private final Instance<CommandHandler<?, ?>> handlers;
+    private final Instance<AsyncCommandHandler<?, ?>> asyncHandlers;
 
     private final Map<Class<?>, CommandHandler<?, ?>> handlerCache = new ConcurrentHashMap<>();
     private final Map<Class<?>, AsyncCommandHandler<?, ?>> asyncHandlerCache = new ConcurrentHashMap<>();
+
+    public MediatorImpl(@Any Instance<CommandHandler<?, ?>> handlers,
+                        @Any Instance<AsyncCommandHandler<?, ?>> asyncHandlers) {
+        this.handlers = handlers;
+        this.asyncHandlers = asyncHandlers;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

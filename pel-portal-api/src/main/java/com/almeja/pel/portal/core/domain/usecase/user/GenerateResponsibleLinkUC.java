@@ -1,20 +1,19 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.dto.record.AuthorizedLinkGeneratedRecord;
 import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.gateway.token.AuthorizedLinkGTW;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class GenerateResponsibleLinkUC {
 
-    @Inject
-    AuthorizedLinkGTW authorizedLinkGTW;
-    @Inject
-    UserRepository userRepository;
+    private final AuthorizedLinkGTW authorizedLinkGTW;
+    private final UserRepository userRepository;
 
     @Transactional
     public AuthorizedLinkGeneratedRecord execute(UserEntity user) {

@@ -4,16 +4,16 @@ import com.almeja.pel.portal.core.domain.usecase.user.SubmitUserReviewUC;
 import com.almeja.pel.portal.core.event.dto.EventPreRegistrationReviewDTO;
 import com.google.gson.Gson;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 
 @Slf4j
 @ApplicationScoped
+@RequiredArgsConstructor
 public class PreRegistrationReviewKafkaListener {
 
-    @Inject
-    SubmitUserReviewUC submitUserReviewUC;
+    private final SubmitUserReviewUC submitUserReviewUC;
 
     @Incoming("pre-registration-review")
     public void execute(String payload) {

@@ -1,6 +1,5 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.dto.record.AuthenticateRecord;
 import com.almeja.pel.portal.core.dto.record.AuthenticatedRecord;
@@ -12,14 +11,14 @@ import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.AuthenticateCommand;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class AuthenticateUC {
 
-    @Inject
-    Mediator mediator;
-    @Inject
-    AuthorizationGTW authorizationGTW;
+    private final Mediator mediator;
+    private final AuthorizationGTW authorizationGTW;
 
     @Transactional
     public AuthenticatedRecord execute(AuthenticateRecord authenticateRecord) {

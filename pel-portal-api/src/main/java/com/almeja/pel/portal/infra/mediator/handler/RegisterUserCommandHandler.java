@@ -5,17 +5,15 @@ import com.almeja.pel.portal.core.domain.usecase.user.GenerateResponsibleLinkUC;
 import com.almeja.pel.portal.core.mediator.CommandHandler;
 import com.almeja.pel.portal.core.mediator.command.RegisterUserCommand;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class RegisterUserCommandHandler implements CommandHandler<RegisterUserCommand, Void> {
 
-    @Inject
-    LinkDependentUC linkDependentUC;
-
-    @Inject
-    GenerateResponsibleLinkUC generateResponsibleLinkUC;
+    private final LinkDependentUC linkDependentUC;
+    private final GenerateResponsibleLinkUC generateResponsibleLinkUC;
 
     @Override
     @Transactional(Transactional.TxType.MANDATORY)

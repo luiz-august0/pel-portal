@@ -1,6 +1,5 @@
 package com.almeja.pel.portal.core.domain.usecase.dependent;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumAuthorizedLinkType;
@@ -13,16 +12,15 @@ import com.almeja.pel.portal.core.gateway.token.AuthorizedLinkGTW;
 import com.almeja.pel.portal.core.util.StringUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class LinkDependentUC {
 
-    @Inject
-    AuthorizedLinkGTW authorizedLinkGTW;
-    @Inject
-    UserRepository userRepository;
-    @Inject
-    UserDependentRepository userDependentRepository;
+    private final AuthorizedLinkGTW authorizedLinkGTW;
+    private final UserRepository userRepository;
+    private final UserDependentRepository userDependentRepository;
 
     @Transactional
     public void execute(UserEntity user, String authorizedToken) {

@@ -11,20 +11,17 @@ import com.almeja.pel.portal.core.mediator.command.RegisterUserCommand;
 import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.util.StringUtil;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class RegisterUC {
 
-    @Inject
-    UserRepository userRepository;
-    @Inject
-    UserCryptPasswordGTW userCryptPasswordGTW;
-    @Inject
-    UserFactory userFactory;
-    @Inject
-    Mediator mediator;
+    private final UserRepository userRepository;
+    private final UserCryptPasswordGTW userCryptPasswordGTW;
+    private final UserFactory userFactory;
+    private final Mediator mediator;
 
     @Transactional
     public void execute(UserRegisterDTO userRegisterDTO) {

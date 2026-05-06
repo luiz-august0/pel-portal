@@ -6,24 +6,22 @@ import com.almeja.pel.portal.core.dto.record.AuthenticatedRecord;
 import com.almeja.pel.portal.core.domain.usecase.user.AuthenticateUC;
 import com.almeja.pel.portal.core.domain.usecase.user.RegisterUC;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
 
 import static com.almeja.pel.portal.infra.constants.PrefixPathConstant.PREFIX_PATH;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 @Path(PREFIX_PATH + "/auth")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class AuthenticationController {
 
-    @Inject
-    AuthenticateUC authenticateUC;
-
-    @Inject
-    RegisterUC registerUC;
+    private final AuthenticateUC authenticateUC;
+    private final RegisterUC registerUC;
 
     @POST
     @Path("/register")

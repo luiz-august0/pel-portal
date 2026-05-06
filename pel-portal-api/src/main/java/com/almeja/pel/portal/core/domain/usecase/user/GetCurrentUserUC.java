@@ -1,23 +1,21 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.exception.AppException;
 import com.almeja.pel.portal.core.exception.enums.EnumAppException;
 import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.infra.context.AuthContext;
 import jakarta.enterprise.context.ApplicationScoped;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class GetCurrentUserUC {
 
-    @Inject
-    UserRepository userRepository;
-
-    @Inject
-    AuthContext authContext;
+    private final UserRepository userRepository;
+    private final AuthContext authContext;
 
     public UserEntity execute() {
         Optional<UserEntity> userOptional = userRepository.findById(authContext.getUser().getId());

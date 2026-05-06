@@ -1,6 +1,5 @@
 package com.almeja.pel.portal.core.domain.usecase.dependent;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.AddressEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.service.VerifyDependentService;
@@ -14,18 +13,17 @@ import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
 import org.hibernate.Hibernate;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class CreateUpdateDependentAddressUC {
 
-    @Inject
-    VerifyDependentService verifyDependentService;
-    @Inject
-    UserRepository userRepository;
-    @Inject
-    Mediator mediator;
+    private final VerifyDependentService verifyDependentService;
+    private final UserRepository userRepository;
+    private final Mediator mediator;
 
     @Transactional
     public void execute(UserEntity responsible, UUID userDependentId, CreateUpdateDependentAddressDTO createUpdateDependentAddressDTO) {

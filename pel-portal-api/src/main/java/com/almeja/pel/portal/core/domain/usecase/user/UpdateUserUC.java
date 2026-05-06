@@ -7,18 +7,16 @@ import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
 import com.almeja.pel.portal.core.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class UpdateUserUC {
 
-    @Inject
-    UserRepository userRepository;
-    @Inject
-    UserFactory userFactory;
-    @Inject
-    Mediator mediator;
+    private final UserRepository userRepository;
+    private final UserFactory userFactory;
+    private final Mediator mediator;
 
     @Transactional
     public void execute(UserEntity user, UserUpdateDTO userUpdateDTO) {

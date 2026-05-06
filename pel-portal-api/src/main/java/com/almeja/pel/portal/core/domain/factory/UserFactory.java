@@ -1,6 +1,5 @@
 package com.almeja.pel.portal.core.domain.factory;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDetailsEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumProgramKnowledgeSource;
@@ -8,14 +7,15 @@ import com.almeja.pel.portal.core.domain.service.UserValidatorService;
 import com.almeja.pel.portal.core.util.Util;
 import com.almeja.pel.portal.core.util.enums.EnumDateFormat;
 import jakarta.enterprise.context.ApplicationScoped;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class UserFactory {
 
-    @Inject
-    UserValidatorService userValidatorService;
+    private final UserValidatorService userValidatorService;
 
     public UserEntity create(String name, String email, String cpf, String password, Date birthDate,
                              String phone, Boolean specialNeeds, EnumProgramKnowledgeSource programKnowledgeSource,

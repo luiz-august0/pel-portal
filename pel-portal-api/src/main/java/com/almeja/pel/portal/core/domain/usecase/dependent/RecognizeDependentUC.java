@@ -1,6 +1,5 @@
 package com.almeja.pel.portal.core.domain.usecase.dependent;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.exception.AppException;
@@ -11,18 +10,17 @@ import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class RecognizeDependentUC {
 
-    @Inject
-    UserDependentRepository userDependentRepository;
-    @Inject
-    UserRepository userRepository;
-    @Inject
-    Mediator mediator;
+    private final UserDependentRepository userDependentRepository;
+    private final UserRepository userRepository;
+    private final Mediator mediator;
 
     @Transactional
     public void execute(UUID dependentId, boolean recognize, UserEntity responsible) {

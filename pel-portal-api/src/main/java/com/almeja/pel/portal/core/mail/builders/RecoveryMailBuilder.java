@@ -4,8 +4,8 @@ import com.almeja.pel.portal.core.domain.entity.TemplateEmailEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumTemplateEmail;
 import com.almeja.pel.portal.core.mail.MailBuilder;
 import com.almeja.pel.portal.core.mail.interfaces.ITemplate;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
 public class RecoveryMailBuilder extends MailBuilder<String> {

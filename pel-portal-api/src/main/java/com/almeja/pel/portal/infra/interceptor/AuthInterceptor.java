@@ -7,28 +7,24 @@ import com.almeja.pel.portal.infra.context.AuthContext;
 import com.almeja.pel.portal.infra.service.token.TokenService;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 @ApplicationScoped
+@RequiredArgsConstructor
 public class AuthInterceptor implements ContainerRequestFilter {
 
-    @Inject
-    TokenService tokenService;
-
-    @Inject
-    UserRepository userRepository;
-
-    @Inject
-    AuthContext authContext;
+    private final TokenService tokenService;
+    private final UserRepository userRepository;
+    private final AuthContext authContext;
 
     private static final String[] EXCLUDED_PATHS = {
             "/auth", "/v3/api-docs", "/swagger-ui", "/openapi", "/q/health", "/q/openapi"

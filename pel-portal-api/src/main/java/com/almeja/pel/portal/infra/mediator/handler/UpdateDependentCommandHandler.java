@@ -4,14 +4,14 @@ import com.almeja.pel.portal.core.domain.usecase.user.UpdateUserUC;
 import com.almeja.pel.portal.core.mediator.CommandHandler;
 import com.almeja.pel.portal.core.mediator.command.UpdateDependentCommand;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class UpdateDependentCommandHandler implements CommandHandler<UpdateDependentCommand, Void> {
 
-    @Inject
-    UpdateUserUC updateUserUC;
+    private final UpdateUserUC updateUserUC;
 
     @Override
     @Transactional(Transactional.TxType.MANDATORY)

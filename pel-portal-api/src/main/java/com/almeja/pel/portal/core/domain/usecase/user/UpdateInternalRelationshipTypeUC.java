@@ -1,6 +1,5 @@
 package com.almeja.pel.portal.core.domain.usecase.user;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumInternalRelationshipType;
 import com.almeja.pel.portal.core.exception.ValidatorException;
@@ -9,14 +8,14 @@ import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class UpdateInternalRelationshipTypeUC {
 
-    @Inject
-    UserRepository userRepository;
-    @Inject
-    Mediator mediator;
+    private final UserRepository userRepository;
+    private final Mediator mediator;
 
     @Transactional
     public void execute(UserEntity user, EnumInternalRelationshipType internalRelationshipType) {

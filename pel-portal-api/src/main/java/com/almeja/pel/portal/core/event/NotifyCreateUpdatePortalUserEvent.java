@@ -12,22 +12,18 @@ import com.almeja.pel.portal.core.repository.DocumentRepository;
 import com.almeja.pel.portal.core.repository.UserDependentRepository;
 import com.almeja.pel.portal.core.util.ConverterEntityToDTOUtil;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class NotifyCreateUpdatePortalUserEvent {
 
-    @Inject
-    EventProducerGTW eventProducerGTW;
-
-    @Inject
-    DocumentRepository documentRepository;
-
-    @Inject
-    UserDependentRepository userDependentRepository;
+    private final EventProducerGTW eventProducerGTW;
+    private final DocumentRepository documentRepository;
+    private final UserDependentRepository userDependentRepository;
 
     public void send(UserEntity user) {
         EventPortalUserDTO eventPortalUser = createEventPortalUser(user);

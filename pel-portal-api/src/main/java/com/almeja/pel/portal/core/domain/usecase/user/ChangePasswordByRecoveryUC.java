@@ -9,20 +9,17 @@ import com.almeja.pel.portal.core.gateway.crypt.UserCryptPasswordGTW;
 import com.almeja.pel.portal.core.gateway.token.RecoveryTokenGTW;
 import com.almeja.pel.portal.core.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class ChangePasswordByRecoveryUC {
 
-    @Inject
-    UserRepository userRepository;
-    @Inject
-    UserValidatorService userValidatorService;
-    @Inject
-    UserCryptPasswordGTW userCryptPasswordGTW;
-    @Inject
-    RecoveryTokenGTW recoveryTokenGTW;
+    private final UserRepository userRepository;
+    private final UserValidatorService userValidatorService;
+    private final UserCryptPasswordGTW userCryptPasswordGTW;
+    private final RecoveryTokenGTW recoveryTokenGTW;
 
     @Transactional
     public void execute(AuthenticationRecoveryPasswordRecord authenticationRecoveryPasswordRecord) {

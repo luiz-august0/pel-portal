@@ -1,6 +1,5 @@
 package com.almeja.pel.portal.core.domain.usecase.document;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.DocumentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
@@ -8,16 +7,16 @@ import com.almeja.pel.portal.core.exception.ValidatorException;
 import com.almeja.pel.portal.core.gateway.file.FileHandlerGTW;
 import com.almeja.pel.portal.core.repository.DocumentRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class DownloadDocumentUC {
 
-    @Inject
-    DocumentRepository documentRepository;
-    @Inject
-    FileHandlerGTW fileHandlerGTW;
+    private final DocumentRepository documentRepository;
+    private final FileHandlerGTW fileHandlerGTW;
 
     public byte[] execute(UserEntity user, EnumDocumentType documentType, boolean validateMinor) {
         if (user.getUserDetails().isMinor() && validateMinor)

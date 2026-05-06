@@ -6,16 +6,16 @@ import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.util.CpfUtil;
 import com.almeja.pel.portal.core.util.StringUtil;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 import java.util.UUID;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class UserValidatorService {
 
-    @Inject
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public void validateName(String name) {
         if (StringUtil.isNullOrEmpty(name)) {

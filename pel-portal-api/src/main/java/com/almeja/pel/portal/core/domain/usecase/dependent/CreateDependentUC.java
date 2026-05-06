@@ -1,6 +1,5 @@
 package com.almeja.pel.portal.core.domain.usecase.dependent;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserDependentEntity;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.factory.UserFactory;
@@ -11,18 +10,17 @@ import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.core.util.DateUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class CreateDependentUC {
 
-    @Inject
-    UserDependentRepository userDependentRepository;
-    @Inject
-    UserFactory userFactory;
-    @Inject
-    UserRepository userRepository;
+    private final UserDependentRepository userDependentRepository;
+    private final UserFactory userFactory;
+    private final UserRepository userRepository;
 
     @Transactional
     public UUID execute(UserEntity responsible, DependentCreateDTO dependentCreateDTO) {

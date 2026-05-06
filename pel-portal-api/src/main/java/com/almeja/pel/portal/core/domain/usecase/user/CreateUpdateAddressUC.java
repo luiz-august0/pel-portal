@@ -8,20 +8,18 @@ import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
 import com.almeja.pel.portal.core.repository.AddressRepository;
 import com.almeja.pel.portal.core.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class CreateUpdateAddressUC {
 
-    @Inject
-    AddressRepository addressRepository;
-    @Inject
-    UserRepository userRepository;
-    @Inject
-    Mediator mediator;
+    private final AddressRepository addressRepository;
+    private final UserRepository userRepository;
+    private final Mediator mediator;
 
     @Transactional
     public UUID execute(UserEntity user, CreateUpdateAddressDTO createUpdateAddressDTO) {

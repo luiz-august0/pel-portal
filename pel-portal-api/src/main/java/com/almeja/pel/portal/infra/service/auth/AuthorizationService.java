@@ -10,18 +10,16 @@ import com.almeja.pel.portal.core.gateway.authorization.AuthorizationGTW;
 import com.almeja.pel.portal.core.repository.UserRepository;
 import com.almeja.pel.portal.infra.service.token.TokenService;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class AuthorizationService implements AuthorizationGTW {
 
-    @Inject
-    TokenService tokenService;
-
-    @Inject
-    UserRepository userRepository;
+    private final TokenService tokenService;
+    private final UserRepository userRepository;
 
     @Override
     public AuthorizedUserRecord authorize(AuthenticateRecord authenticateRecord) {

@@ -9,59 +9,35 @@ import com.almeja.pel.portal.infra.dto.DependentDTO;
 import com.almeja.pel.portal.infra.dto.DependentsLinkedListDTO;
 import com.almeja.pel.portal.infra.dto.mapper.DependentsLinkedListMapper;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
 import static com.almeja.pel.portal.infra.constants.PrefixPathConstant.PREFIX_PATH;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 @Path(PREFIX_PATH + "/dependent")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DependentController {
 
-    @Inject
-    ListDependentsLinkedUC listDependentsLinkedUC;
-
-    @Inject
-    RecognizeDependentUC recognizeDependentUC;
-
-    @Inject
-    UpdateDependentUC updateDependentUC;
-
-    @Inject
-    AddRelationshipAndUpdateSpecialNeedsUC addRelationshipAndUpdateSpecialNeedsUC;
-
-    @Inject
-    CreateUpdateDependentAddressUC createUpdateDependentAddressUC;
-
-    @Inject
-    UploadDependentDocumentUC uploadDependentDocumentUC;
-
-    @Inject
-    GetDependentDocumentUC getDependentDocumentUC;
-
-    @Inject
-    DownloadDependentDocumentUC downloadDependentDocumentUC;
-
-    @Inject
-    DeleteDependentDocumentUC deleteDependentDocumentUC;
-
-    @Inject
-    GetDependentInfoUC getDependentInfoUC;
-
-    @Inject
-    CreateDependentUC createDependentUC;
-
-    @Inject
-    GetMinorResponsibleUC getMinorResponsibleUC;
-
-    @Inject
-    AuthContext authContext;
+    private final ListDependentsLinkedUC listDependentsLinkedUC;
+    private final RecognizeDependentUC recognizeDependentUC;
+    private final UpdateDependentUC updateDependentUC;
+    private final AddRelationshipAndUpdateSpecialNeedsUC addRelationshipAndUpdateSpecialNeedsUC;
+    private final CreateUpdateDependentAddressUC createUpdateDependentAddressUC;
+    private final UploadDependentDocumentUC uploadDependentDocumentUC;
+    private final GetDependentDocumentUC getDependentDocumentUC;
+    private final DownloadDependentDocumentUC downloadDependentDocumentUC;
+    private final DeleteDependentDocumentUC deleteDependentDocumentUC;
+    private final GetDependentInfoUC getDependentInfoUC;
+    private final CreateDependentUC createDependentUC;
+    private final GetMinorResponsibleUC getMinorResponsibleUC;
+    private final AuthContext authContext;
 
     @POST
     @Path("/create")

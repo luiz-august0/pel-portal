@@ -1,18 +1,18 @@
 package com.almeja.pel.portal.core.domain.usecase.document;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.domain.service.DeleteDocumentService;
 import com.almeja.pel.portal.core.exception.ValidatorException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class DeleteDocumentUC {
 
-    @Inject
-    DeleteDocumentService deleteDocumentService;
+    private final DeleteDocumentService deleteDocumentService;
 
     @Transactional
     public void execute(UserEntity user, EnumDocumentType documentType, boolean validateMinor) {

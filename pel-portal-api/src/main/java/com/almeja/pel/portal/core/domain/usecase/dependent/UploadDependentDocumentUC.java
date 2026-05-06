@@ -1,6 +1,5 @@
 package com.almeja.pel.portal.core.domain.usecase.dependent;
 
-import jakarta.inject.Inject;
 import com.almeja.pel.portal.core.domain.entity.UserEntity;
 import com.almeja.pel.portal.core.domain.enums.EnumDocumentType;
 import com.almeja.pel.portal.core.domain.service.UploadDocumentService;
@@ -11,19 +10,18 @@ import com.almeja.pel.portal.core.mediator.Mediator;
 import com.almeja.pel.portal.core.mediator.command.UpdateUserCommand;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
 
 @ApplicationScoped
+@RequiredArgsConstructor
 public class UploadDependentDocumentUC {
 
-    @Inject
-    VerifyDependentService verifyDependentService;
-    @Inject
-    UploadDocumentService uploadDocumentService;
-    @Inject
-    Mediator mediator;
+    private final VerifyDependentService verifyDependentService;
+    private final UploadDocumentService uploadDocumentService;
+    private final Mediator mediator;
 
     @Transactional
     public void execute(UserEntity responsible, UUID userDependentId, EnumDocumentType documentType, MultipartDTO multipartDTO) {
